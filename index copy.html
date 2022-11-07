@@ -1,0 +1,164 @@
+<html>
+<head>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<svg id="chord" height="850" width="850" style="background: #fff; margin-top:50px" >
+    </svg>
+
+<svg id="spider" height="600" width="600"></svg>
+<div id="button-bar"></div>
+
+<script>
+
+let data = [];
+let features = ["A","B","C"];
+console.log(features.length);
+console.log(features[0]);
+
+
+for (var i = 0; i < 3; i++){
+        var point = {}
+
+        features.forEach(f => point[f] = 1 + Math.random() * 8);
+        data.push(point);
+    }
+console.log(data);
+
+
+
+allKeys = Object.keys(data);
+console.log(allKeys);
+
+allKeys.forEach( d => {
+
+d3.select("div#button-bar")
+  .append("button")
+  .text(d)
+  .on('click', function(){
+    updateSpider(d);
+
+  })
+
+});
+
+function updateSpider (yearKey) {
+    const yearData = data[yearKey];
+    console.log(yearData);
+    console.log(yearData.length);
+    console.log(yearData[1]);
+    
+
+ 
+    const spiderChart = d3.select("#spider").append("g");
+let radialScale = d3.scaleLinear()
+    .domain([0,10])
+    .range([0,250]);
+let ticks = [2,4,6,8,10];
+
+
+ticks.forEach(t =>
+    spiderChart.append("circle")
+    .attr("cx", 300)
+    .attr("cy", 300)
+    .attr("fill", "none")
+    .attr("stroke", "gray")
+    .attr("r", radialScale(t))
+);
+
+function angleToCoordinate(angle, value){
+    let x = Math.cos(angle) * radialScale(value);
+    let y = Math.sin(angle) * radialScale(value);
+    return {"x": 300 + x, "y": 300 - y};
+}
+
+for (var i = 0; i < features.length; i++) {
+    console.log(i);
+    let ft_name = features[i];
+    let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+    let line_coordinate = angleToCoordinate(angle, 10);
+    let label_coordinate = angleToCoordinate(angle, 10.5);
+
+    //draw axis line
+    spiderChart.append("line")
+    .attr("x1", 300)
+    .attr("y1", 300)
+    .attr("x2", line_coordinate.x)
+    .attr("y2", line_coordinate.y)
+    .attr("stroke","black");
+
+    //draw axis label
+    spiderChart.append("text")
+    .attr("x", label_coordinate.x)
+    .attr("y", label_coordinate.y)
+    .text(ft_name);
+}
+
+let line = d3.line()
+    .x(d => d.x)
+    .y(d => d.y);
+let colors = ["darkorange", "gray", "navy"];
+
+function getPathCoordinates(data_point){
+    let coordinates = [];
+    for (var i = 0; i < features.length; i++){
+        let ft_name = features[i];
+    
+        let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+        coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
+    }
+    return coordinates;
+}
+
+
+//for (var i = 0; i < data.length; i ++){
+
+    let d = yearData;
+    console.log(d);
+    let color = 'gray';
+    let coordinates = getPathCoordinates(d);
+
+    //draw the path element
+    spiderChart.append("path")
+    .datum(coordinates)
+    .attr("d",line)
+    .attr("stroke-width", 3)
+    .attr("stroke", color)
+    .attr("fill", color)
+    .attr("stroke-opacity", 1)
+    .attr("opacity", 0.5);
+}
+
+
+updateSpider('0');
+
+
+
+const width = d3.select("#chord").attr("width");
+const height = d3.select("#chord").attr("height");
+const chordChart = d3.select("#chord").append("g");
+  
+const drawChord = async () => {
+
+
+    const edges = await d3.json("./edges_filtered.json");
+    const nodes = await d3.json("./nodes.json");
+    console.log(edges);
+    console.log(nodes);
+
+    console.log(nodes.length);
+
+
+};
+drawChord();
+
+
+
+
+
+
+</script>
+ 
+</body>
+</html>
