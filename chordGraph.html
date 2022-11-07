@@ -18,9 +18,74 @@
                                     "#604020", "#d48f4d", "#f24219", "#8e1023", 
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
-              const edges = await d3.json("edges.json");
+              const edges_ds = await d3.json("edges.json");
+              const nodes_ds = await d3.json("nodes.json");
+
+              let links = edges_ds;
+              let nodes = nodes_ds;
+
+              console.log(links);
+              console.log(nodes);
               
-              console.log(edges);
+              let matrix = [];
+              let connections = {}; 
+              for (let i=0; i< Object.keys(nodes).length; i++) {
+                  let row = [];
+                  for (let j=0; j< Object.keys(nodes).length; j++) {row.push(0);}
+                  matrix.push(row);
+                  connections[i] = [i]; 
+              }
+              console.log(matrix);
+
+              Object.values(links).forEach( d => {
+                if (d.Weight > 0) {
+                      matrix[d.Source][d.Target] = d.Weight;
+                      matrix[d.Target][d.Source] = d.Weight;
+                      connections[d.Source].push(d.Target);
+                      connections[d.Target].push(d.Source);
+                }
+              });
+              console.log(connections);
+
+              let radius = (width / 2.0) - 125;
+              
+              let chordGen = d3.chord()
+                    .padAngle(.04)
+                    .sortSubgroups(d3.descending)
+                    .sortChords(d3.descending)
+              let arcGen = d3.arc()
+                    .innerRadius(radius)
+                    .outerRadius(radius + 20)
+              let ribbonGen = d3.ribbon()
+                      .radius(radius)
+              let chords = chordGen(matrix);
+              
+              console.log(chords);
+
+              chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
+              let colorScale = d3.scaleOrdinal().range(colorPalette);
+
+              let ringContainer = chordChart.append("g");
+              let rings = ringContainer.selectAll("g.segment")
+                            .data(chords.groups)
+                            .join("g")
+                            .attr("class","segment");
+            
+              rings.append("path")
+                   .attr("fill", d => colorScale( nodes[ d.index ].Continent ))
+                   .attr("stroke", d => colorScale( nodes[ d.index ].Continent ))
+                   .attr("d", arcGen);
+
+              let ribbonContainer = chordChart.append("g");
+              let ribbons = ribbonContainer.selectAll("path.ribbon")
+                      .data(chords)
+                      .join("path")
+                      .attr("class","ribbon")
+                      .attr("fill-opacity", 0.5)
+                      .attr("stroke", "none")
+                      .attr("fill", d => colorScale( nodes[ d.source.index ].SubContinent ))
+                      .attr("d", ribbonGen);
+
             }
             drawChord();
         </script>
