@@ -18,7 +18,7 @@ console.log(features.length);
 console.log(features[0]);
 
 
-for (var i = 0; i < 3; i++){
+for (var i = 0; i < 9; i++){
         var point = {}
 
         features.forEach(f => point[f] = 1 + Math.random() * 8);
@@ -31,27 +31,18 @@ console.log(data);
 allKeys = Object.keys(data);
 console.log(allKeys);
 
-allKeys.forEach( d => {
 
-d3.select("div#button-bar")
-  .append("button")
-  .text(d)
-  .on('click', function(){
-    updateSpider(d);
+                    
+const svg = d3.select("svg#spider");
+const width = svg.attr("width");
+const height = svg.attr("height");
+const margin = {top: 10, right: 10, bottom: 50, left: 50};
+const chartWidth = width - margin.left - margin.right;
+const chartHeight = height - margin.top - margin.bottom;
+let spiderChart = svg.append("g").attr("id","diagrams")
+.attr("transform",`translate(${margin.left},${margin.top})`);
+let annotations = svg.append("g").attr("id","annotations");
 
-  })
-
-});
-
-function updateSpider (yearKey) {
-    const yearData = data[yearKey];
-    console.log(yearData);
-    console.log(yearData.length);
-    console.log(yearData[1]);
-    
-
- 
-    const spiderChart = d3.select("#spider").append("g");
 let radialScale = d3.scaleLinear()
     .domain([0,10])
     .range([0,250]);
@@ -59,7 +50,7 @@ let ticks = [2,4,6,8,10];
 
 
 ticks.forEach(t =>
-    spiderChart.append("circle")
+    annotations.append("circle")
     .attr("cx", 300)
     .attr("cy", 300)
     .attr("fill", "none")
@@ -81,7 +72,7 @@ for (var i = 0; i < features.length; i++) {
     let label_coordinate = angleToCoordinate(angle, 10.5);
 
     //draw axis line
-    spiderChart.append("line")
+    annotations.append("line")
     .attr("x1", 300)
     .attr("y1", 300)
     .attr("x2", line_coordinate.x)
@@ -89,11 +80,30 @@ for (var i = 0; i < features.length; i++) {
     .attr("stroke","black");
 
     //draw axis label
-    spiderChart.append("text")
+    annotations.append("text")
     .attr("x", label_coordinate.x)
     .attr("y", label_coordinate.y)
     .text(ft_name);
 }
+
+allKeys.forEach( d => {
+
+d3.select("div#button-bar")
+  .append("button")
+  .text(d)
+  .on('click', function(){
+    updateSpider(d);
+
+  })
+
+});
+
+function updateSpider (yearKey) {
+    const yearData = data[yearKey];
+    console.log(yearData);
+ 
+    
+
 
 let line = d3.line()
     .x(d => d.x)
@@ -101,7 +111,7 @@ let line = d3.line()
 let colors = ["darkorange", "gray", "navy"];
 
 function getPathCoordinates(data_point){
-    let coordinates = [];
+let coordinates = [];
     for (var i = 0; i < features.length; i++){
         let ft_name = features[i];
     
@@ -112,46 +122,85 @@ function getPathCoordinates(data_point){
 }
 
 
-//for (var i = 0; i < data.length; i ++){
+//for (var i = 0; i < 3; i ++){
 
     let d = yearData;
-    console.log(d);
+    
     let color = 'gray';
     let coordinates = getPathCoordinates(d);
+    console.log(coordinates);
+    console.log(coordinates['0']['x']);
+
 
     //draw the path element
+
+    // let elements = spiderChart.selectAll('path').datum(coordinates);
+    // console.log(elements);
+   
+
+    // spiderChart
+    //         .append('path')
+    //         .attr("d",line)
+    //         .attr("x1",300)
+    //         .attr("x2",400)
+    //         .attr("y1",500)
+    //         .attr("y2",500)
+    //         .attr("stroke-width", 3)
+    //         .attr("stroke", 'gray')
+    //         .attr("fill", 'gray')
+    //         .attr("stroke-opacity", 1)
+    //         .attr("opacity", 0.5);
+                    
+
     spiderChart.append("path")
     .datum(coordinates)
-    .attr("d",line)
-    .attr("stroke-width", 3)
-    .attr("stroke", color)
-    .attr("fill", color)
-    .attr("stroke-opacity", 1)
-    .attr("opacity", 0.5);
+                        .attr("d",line)
+                        .attr("stroke-width", 3)
+                        .attr("stroke", color)
+                        .attr("fill", color)
+                        .attr("stroke-opacity", 1)
+                        .attr("opacity", 0.5);
+
+    
+
+
+    // spiderChart.selectAll('path')
+    // .datum(coordinates)
+    // .join(
+    //     enter => { enter.append('path')
+    //                     .attr("d",line)
+    //                     .attr("stroke-width", 3)
+    //                     .attr("stroke", color)
+    //                     .attr("fill", color)
+    //                     .attr("stroke-opacity", 1)
+    //                     .attr("opacity", 0.5)},
+
+    //    // exit => exit.call( exit => exit.transition().attr('opacity',0).remove() )
+    // ); 
+//}
+
 }
-
-
 updateSpider('0');
 
 
 
-const width = d3.select("#chord").attr("width");
-const height = d3.select("#chord").attr("height");
-const chordChart = d3.select("#chord").append("g");
+// const width = d3.select("#chord").attr("width");
+// const height = d3.select("#chord").attr("height");
+// const chordChart = d3.select("#chord").append("g");
   
-const drawChord = async () => {
+// const drawChord = async () => {
 
 
-    const edges = await d3.json("./edges_filtered.json");
-    const nodes = await d3.json("./nodes.json");
-    console.log(edges);
-    console.log(nodes);
+//     const edges = await d3.json("./edges_filtered.json");
+//     const nodes = await d3.json("./nodes.json");
+//     console.log(edges);
+//     console.log(nodes);
 
-    console.log(nodes.length);
+//     console.log(nodes.length);
 
 
-};
-drawChord();
+// };
+// drawChord();
 
 
 
