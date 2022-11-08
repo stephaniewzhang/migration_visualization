@@ -13,19 +13,36 @@
 <script>
 
 let data = [];
+// let Dict = { 'China': { '1990':{},'1995':{},'2000':{} },
+//          'Japan': { '1990':{},'1995':{},'2000':{}}}
 let features = ["A","B","C"];
+
 console.log(features.length);
-console.log(features[0]);
+
+console.log(data);
 
 
-for (var i = 0; i < 9; i++){
+
+for (var i = 0; i < 9; i++ ){
         var point = {}
 
         features.forEach(f => point[f] = 1 + Math.random() * 8);
         data.push(point);
     }
-console.log(data);
+    console.log(data);
 
+
+
+
+// for  (var i = 0; i < 5; i++){
+//     data[i]["Country"] = "China";
+// }
+
+// for (var i = 5; i < 9; i++){
+//     data[i]["Country"] = "United States";
+// }
+
+// console.log(data)
 
 
 allKeys = Object.keys(data);
@@ -98,6 +115,15 @@ d3.select("div#button-bar")
 
 });
 
+tri = spiderChart.append("path")
+    //.datum(coordinates)
+     //                   .attr("d",line)
+                        .attr("stroke-width", 3)
+
+                        .attr("stroke-opacity", 1)
+                        .attr("opacity", 0.5);
+
+
 function updateSpider (yearKey) {
     const yearData = data[yearKey];
     console.log(yearData);
@@ -128,44 +154,20 @@ let coordinates = [];
     
     let color = 'gray';
     let coordinates = getPathCoordinates(d);
-    console.log(coordinates);
-    console.log(coordinates['0']['x']);
-
-
-    //draw the path element
-
-    // let elements = spiderChart.selectAll('path').datum(coordinates);
-    // console.log(elements);
-   
-
-    // spiderChart
-    //         .append('path')
-    //         .attr("d",line)
-    //         .attr("x1",300)
-    //         .attr("x2",400)
-    //         .attr("y1",500)
-    //         .attr("y2",500)
-    //         .attr("stroke-width", 3)
-    //         .attr("stroke", 'gray')
-    //         .attr("fill", 'gray')
-    //         .attr("stroke-opacity", 1)
-    //         .attr("opacity", 0.5);
-                    
-
-    spiderChart.append("path")
-    .datum(coordinates)
-                        .attr("d",line)
-                        .attr("stroke-width", 3)
-                        .attr("stroke", color)
-                        .attr("fill", color)
-                        .attr("stroke-opacity", 1)
-                        .attr("opacity", 0.5);
-
+    console.log("coordinates", coordinates);
     
 
 
+    //draw the path element
+     tri.datum(coordinates)  
+     .transition()
+        .attr("d", line) 
+        .attr("stroke", color)
+                        .attr("fill", color)            
+  
+    
     // spiderChart.selectAll('path')
-    // .datum(coordinates)
+    // .data([coordinates])
     // .join(
     //     enter => { enter.append('path')
     //                     .attr("d",line)
