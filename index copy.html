@@ -8,28 +8,41 @@
     </svg>
 
 <svg id="spider" height="600" width="600"></svg>
-<div id="button-bar"></div>
+<div id="send-bar"></div>
+<div id="receive-bar"></div>
 
 <script>
 
 let data = [];
-// let Dict = { 'China': { '1990':{},'1995':{},'2000':{} },
-//          'Japan': { '1990':{},'1995':{},'2000':{}}}
-let features = ["A","B","C"];
-
-console.log(features.length);
-
-console.log(data);
+//  let Dict = { 'China': 
+//  { '1990':1,'1995':1,'2000':1 },
+//           'Japan': { '1990':{},'1995':{},'2000':{}}}
+const features = ["health","climate","civil liberty"];
+const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
 
 
 
-for (var i = 0; i < 9; i++ ){
-        var point = {}
 
-        features.forEach(f => point[f] = 1 + Math.random() * 8);
-        data.push(point);
-    }
-    console.log(data);
+
+country_data = {
+'China': {'health': 3.363636363636363, 'climate': 0.7257151269449413, 'civil liberty': 4},
+'Japan': {'health': 9.772727272727273, 'climate': 3.918873009761511, 'civil liberty': 8},
+'South Korea': {'health': 8.136363636363637, 'climate': 4.033474509093379, 'civil liberty': 8},
+'North Korea': {'health': 0.13636363636363508, 'climate': 0.0, 'civil liberty': 3}, 
+'Taiwan': {'health': 7.0, 'climate': 4.87011075125133, 'civil liberty': 9}, 
+'Mongolia': {'health': 0.0, 'climate': 0.1468756369895592, 'civil liberty': 8}, 
+'United States': {'health': 9.113636363636362, 'climate': 10.0, 'civil liberty': 9},
+'Canada': {'health': 10.0, 'climate': 8.362568794872375, 'civil liberty': 9} }
+console.log(country_data)
+
+
+// for (var i = 0; i < 3; i++ ){
+//         var point = {}
+
+//         features.forEach(f => point[f] = 1 + Math.random() * 8);
+//         data.push(point);
+//     }
+//     console.log(data);
 
 
 
@@ -45,19 +58,17 @@ for (var i = 0; i < 9; i++ ){
 // console.log(data)
 
 
-allKeys = Object.keys(data);
-console.log(allKeys);
+allKeys = Object.keys(country_data);
+console.log("allkeys", allKeys);
 
 
                     
 const svg = d3.select("svg#spider");
 const width = svg.attr("width");
 const height = svg.attr("height");
-const margin = {top: 10, right: 10, bottom: 50, left: 50};
-const chartWidth = width - margin.left - margin.right;
-const chartHeight = height - margin.top - margin.bottom;
-let spiderChart = svg.append("g").attr("id","diagrams")
-.attr("transform",`translate(${margin.left},${margin.top})`);
+
+
+let spiderChart = svg.append("g").attr("id","diagrams");
 let annotations = svg.append("g").attr("id","annotations");
 
 let radialScale = d3.scaleLinear()
@@ -87,6 +98,7 @@ for (var i = 0; i < features.length; i++) {
     let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
     let line_coordinate = angleToCoordinate(angle, 10);
     let label_coordinate = angleToCoordinate(angle, 10.5);
+    console.log(line_coordinate);
 
     //draw axis line
     annotations.append("line")
@@ -105,52 +117,74 @@ for (var i = 0; i < features.length; i++) {
 
 allKeys.forEach( d => {
 
-d3.select("div#button-bar")
+d3.select("div#send-bar")
   .append("button")
   .text(d)
   .on('click', function(){
-    updateSpider(d);
+    updateSend(d);
 
   })
 
+
+  d3.select("div#receive-bar")
+  .append("button")
+  .text(d)
+  .on('click', function(){
+    updateReceive(d);
+
+  })
+
+
 });
 
-tri = spiderChart.append("path")
-    //.datum(coordinates)
-     //                   .attr("d",line)
-                        .attr("stroke-width", 3)
+tri_send = spiderChart.append("path")
+                 .attr("stroke-width", 3)
+                 .attr("stroke-opacity", 1)
+                 .attr("opacity", 0.5);
 
-                        .attr("stroke-opacity", 1)
-                        .attr("opacity", 0.5);
+tri_receive = spiderChart.append("path")
+                 .attr("stroke-width", 3)
+                 .attr("stroke-opacity", 1)
+                 .attr("opacity", 0.5);
 
 
-function updateSpider (yearKey) {
-    const yearData = data[yearKey];
-    console.log(yearData);
- 
+
+let colorScale = d3.scaleOrdinal()
+                    .domain(country_names)
+                    .range(["tomato", "slateblue", "navy","rosybrown","skyblue","sandybrown","plum"])
+
+
+
+
+
+
+function updateSend (countryKey) {
+    const data = country_data[countryKey];
+
+        console.log("data",data)
     
 
 
 let line = d3.line()
     .x(d => d.x)
     .y(d => d.y);
-let colors = ["darkorange", "gray", "navy"];
+
 
 function getPathCoordinates(data_point){
 let coordinates = [];
     for (var i = 0; i < features.length; i++){
         let ft_name = features[i];
     
-        let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+        let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
         coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
     }
     return coordinates;
 }
 
 
-//for (var i = 0; i < 3; i ++){
 
-    let d = yearData;
+    let d = data;
+    console.log("d",d);
     
     let color = 'gray';
     let coordinates = getPathCoordinates(d);
@@ -159,51 +193,60 @@ let coordinates = [];
 
 
     //draw the path element
-     tri.datum(coordinates)  
-     .transition()
+    tri_send.datum(coordinates)  
+        .transition()
         .attr("d", line) 
-        .attr("stroke", color)
-                        .attr("fill", color)            
+        .attr("stroke", d => colorScale(d))
+        .attr("fill", d => colorScale(d))            
   
-    
-    // spiderChart.selectAll('path')
-    // .data([coordinates])
-    // .join(
-    //     enter => { enter.append('path')
-    //                     .attr("d",line)
-    //                     .attr("stroke-width", 3)
-    //                     .attr("stroke", color)
-    //                     .attr("fill", color)
-    //                     .attr("stroke-opacity", 1)
-    //                     .attr("opacity", 0.5)},
-
-    //    // exit => exit.call( exit => exit.transition().attr('opacity',0).remove() )
-    // ); 
-//}
 
 }
-updateSpider('0');
 
 
 
-// const width = d3.select("#chord").attr("width");
-// const height = d3.select("#chord").attr("height");
-// const chordChart = d3.select("#chord").append("g");
+function updateReceive (countryKey) {
+    const data = country_data[countryKey];
+
+        console.log("data",data)
+    
+
+
+let line = d3.line()
+    .x(d => d.x)
+    .y(d => d.y);
+
+
+function getPathCoordinates(data_point){
+let coordinates = [];
+    for (var i = 0; i < features.length; i++){
+        let ft_name = features[i];
+    
+        let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
+        coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
+    }
+    return coordinates;
+}
+
+
+
+    let d = data;
+    console.log("d",d);
+    
+    let color = 'gray';
+    let coordinates = getPathCoordinates(d);
+    console.log("coordinates", coordinates);
+    
+
+
+    //draw the path element
+    tri_receive.datum(coordinates)  
+        .transition()
+        .attr("d", line) 
+        .attr("stroke", d => colorScale(d))
+        .attr("fill", d => colorScale(d))            
   
-// const drawChord = async () => {
 
-
-//     const edges = await d3.json("./edges_filtered.json");
-//     const nodes = await d3.json("./nodes.json");
-//     console.log(edges);
-//     console.log(nodes);
-
-//     console.log(nodes.length);
-
-
-// };
-// drawChord();
-
+}
 
 
 
