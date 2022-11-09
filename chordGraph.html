@@ -24,8 +24,8 @@
               let links = edges_ds;
               let nodes = nodes_ds;
 
-              console.log(links);
-              console.log(nodes);
+              console.log("links", links);
+              console.log("nodes", nodes);
               
               let matrix = [];
               let connections = {}; 
@@ -35,7 +35,7 @@
                   matrix.push(row);
                   connections[i] = [i]; 
               }
-              console.log(matrix);
+              console.log("matrix", matrix);
 
               Object.values(links).forEach( d => {
                 if (d.Weight > 0) {
@@ -45,26 +45,28 @@
                       connections[d.Target].push(d.Source);
                 }
               });
-              console.log(connections);
+              console.log("connections", connections);
 
               let radius = (width / 2.0) - 125;
-              
               let chordGen = d3.chord()
                     .padAngle(.04)
                     .sortSubgroups(d3.descending)
-                    .sortChords(d3.descending)
+                    .sortChords(d3.descending);
+                    
+              // Thickness of container
               let arcGen = d3.arc()
                     .innerRadius(radius)
-                    .outerRadius(radius + 20)
+                    .outerRadius(radius + 40);
               let ribbonGen = d3.ribbon()
-                      .radius(radius)
+                      .radius(radius);
               let chords = chordGen(matrix);
               
-              console.log(chords);
+              console.log("chords", chords);
 
               chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
               let colorScale = d3.scaleOrdinal().range(colorPalette);
 
+              // Circular Container
               let ringContainer = chordChart.append("g");
               let rings = ringContainer.selectAll("g.segment")
                             .data(chords.groups)
@@ -72,10 +74,11 @@
                             .attr("class","segment");
             
               rings.append("path")
-                   .attr("fill", d => colorScale( nodes[ d.index ].Continent ))
-                   .attr("stroke", d => colorScale( nodes[ d.index ].Continent ))
+                   .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
+                   .attr("stroke", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("d", arcGen);
 
+              // Ribbons
               let ribbonContainer = chordChart.append("g");
               let ribbons = ribbonContainer.selectAll("path.ribbon")
                       .data(chords)
@@ -86,6 +89,29 @@
                       .attr("fill", d => colorScale( nodes[ d.source.index ].SubContinent ))
                       .attr("d", ribbonGen);
 
+              // Label the Subcontinents
+              chords.groups.forEach(d =>{
+                  let transform = '';
+                  // find midpoint, convert to degrees
+                  let midpoint = (d.startAngle + d.endAngle) / 2;
+                  let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+                  //2PI*unit radius = 360, PI*unit = 180
+                  transform = transform + ` rotate(${rotation})`;
+                  transform = transform + ` translate(${radius+25}, 0)`;
+                  d.anchor = 'middle'
+                  if (rotation > 90) {
+                      transform = transform + ' rotate(180)';
+                      // Notice text anchor issue that also first
+                      d.anchor = "middle";
+                  }
+                  d.trans = transform;
+              });
+              
+              rings.append('text')
+                   .attr('transform', d=> d.trans)
+                   .text(d => nodes[d.index].SubContinent)
+                   .attr('text-anchor', d => d.anchor);
+                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
         </script>
