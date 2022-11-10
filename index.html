@@ -155,11 +155,11 @@
                   transform = transform + ` rotate(${rotation})`;
                   transform = transform + ` translate(${radius+25}, 0)`;
                   d.anchor = 'middle'
-                  if (rotation > 90) {
-                      transform = transform + ' rotate(180)';
+                  //if (rotation > 90) {
+                      transform = transform + ' rotate(90)';
                       // Notice text anchor issue that also first
                       d.anchor = "middle";
-                  }
+                 // }
                   d.trans = transform;
               });
               
