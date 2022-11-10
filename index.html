@@ -1,12 +1,14 @@
 <html>
     <head>
         <title>Visualization</title>
+
+        <link rel="stylesheet" type="text/css" href="../css/styles.css">
         <script src="https://d3js.org/d3.v7.min.js"></script>
     </head>
     <body>
         <!-- First Visualization: Chord Diagram -->
-        <h1>Chord Graph Example</h1>
-        <svg id="chord" height="850" width="850" style="background: #fff; margin-top:50px" ></svg>
+        <!--<h1>Chord Graph Example</h1> -->
+        <svg id="chord" height="800" width="800" ></svg>
         <script>
             const width = d3.select("#chord").attr("width");
             const height = d3.select("#chord").attr("height");
@@ -118,26 +120,41 @@
         </script>
 
         <!-- Second Visualization: Spider Diagram -->
-        <h1>Spider Diagram</h1>
+       <!---<h1>Spider Diagram</h1> -->
         <p id = 'spider-chart'>
-            <svg id="spider" height="600" width="600"></svg>
-            <div id="send-bar"></div>
-            <div id="receive-bar"></div>
+
+            <div id="send-bar">
+                <h3>Sending country:</h3>
+            </div>
+            <div id="receive-bar">
+                <h3>Receiving country:</h3>
+            </div>
+
+            <svg id="spider" height="650" width="650"></svg>
+
             
             <script>
             
-            const features = ["health","climate","civil liberty"];
+            const features = ["Health","CO2 Emission","Civil Liberty"];
             const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
+            const country_colors = ['#5E1240','#134C5B','#E16425','#033148','#0D6D76','#C88477','#E6484B','#AAD9D1']
+
+
+            let spider_colorScale = d3.scaleOrdinal()
+                                .domain([country_names])
+                                .range(country_colors);
+
+
             
             country_data = {
-            'China': {'health': 3.363636363636363, 'climate': 0.7257151269449413, 'civil liberty': 4},
-            'Japan': {'health': 9.772727272727273, 'climate': 3.918873009761511, 'civil liberty': 8},
-            'South Korea': {'health': 8.136363636363637, 'climate': 4.033474509093379, 'civil liberty': 8},
-            'North Korea': {'health': 0.13636363636363508, 'climate': 0.0, 'civil liberty': 3}, 
-            'Taiwan': {'health': 7.0, 'climate': 4.87011075125133, 'civil liberty': 9}, 
-            'Mongolia': {'health': 0.0, 'climate': 0.1468756369895592, 'civil liberty': 8}, 
-            'United States': {'health': 9.113636363636362, 'climate': 10.0, 'civil liberty': 9},
-            'Canada': {'health': 10.0, 'climate': 8.362568794872375, 'civil liberty': 9} }
+            'China': {'Health': 6.2, 'CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
+            'Japan': {'Health': 9.02, 'CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
+            'South Korea': {'Health': 8.3, 'CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
+            'North Korea': {'Health': 4.78, 'CO2 Emission': 0.0, 'Civil Liberty': 3}, 
+            'Taiwan': {'Health': 7.8, 'CO2 Emission': 4.87011075125133, 'Civil Liberty': 9}, 
+            'Mongolia': {'Health': 4.72, 'CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
+            'United States': {'Health': 8.73, 'CO2 Emission': 10.0, 'Civil Liberty': 9},
+            'Canada': {'Health': 9.12, 'CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
             console.log(country_data)
             
             allKeys = Object.keys(country_data);
@@ -151,8 +168,8 @@
             let annotations = svg.append("g").attr("id","annotations");
             
             let radialScale = d3.scaleLinear()
-                .domain([0,10])
-                .range([0,250]);
+                .domain([0,5])
+                .range([0,125]);
             let ticks = [2,4,6,8,10];
             
             ticks.forEach(t =>
@@ -160,7 +177,7 @@
                 .attr("cx", 300)
                 .attr("cy", 300)
                 .attr("fill", "none")
-                .attr("stroke", "gray")
+                .attr("stroke", "lightgray")
                 .attr("r", radialScale(t))
             );
             
@@ -184,13 +201,16 @@
                 .attr("y1", 300)
                 .attr("x2", line_coordinate.x)
                 .attr("y2", line_coordinate.y)
-                .attr("stroke","black");
+                .attr("stroke","lightgray");
             
                 //draw axis label
                 annotations.append("text")
                 .attr("x", label_coordinate.x)
                 .attr("y", label_coordinate.y)
-                .text(ft_name);
+                .text(ft_name)
+                .attr("stroke","gray")
+                .attr("fill","gray");
+
             }
             
             allKeys.forEach( d => {
@@ -198,15 +218,24 @@
             d3.select("div#send-bar")
               .append("button")
               .text(d)
+              .style ("display" , "inline-block")
+              .style("margin","4")
+              //.style ('text-decoration',"none")
+             // .style ("background-color",spider_colorScale(d) )
+            //   .style("stroke-width",10)
+            //   .style ("border-color", "white")
+            //   .attr ("opacity" , 0.5)
+            //   .style ("color" ,"white")
               .on('click', function(){
-                updateSend(d);
+                updateSend(d); 
             
-              })
+              }) 
             
             
               d3.select("div#receive-bar")
               .append("button")
               .text(d)
+              .style("margin","4")
               .on('click', function(){
                 updateReceive(d);
             
@@ -218,18 +247,18 @@
             tri_send = spiderChart.append("path")
                              .attr("stroke-width", 3)
                              .attr("stroke-opacity", 1)
-                             .attr("opacity", 0.5);
+                             .attr("opacity", 0.7);
             
             tri_receive = spiderChart.append("path")
                              .attr("stroke-width", 3)
                              .attr("stroke-opacity", 1)
-                             .attr("opacity", 0.5);
+                             .attr("opacity", 0.7);
             
             
             
-            let colorScale = d3.scaleOrdinal()
-                                .domain(country_names)
-                                .range(["tomato", "slateblue", "navy","rosybrown","skyblue","sandybrown","plum"])
+
+
+            console.log("spider_colorScale", spider_colorScale);            
             
             
             function updateSend (countryKey) {
@@ -257,7 +286,7 @@
                 let d = data;
                 console.log("d",d);
                 
-                let color = 'gray';
+                
                 let coordinates = getPathCoordinates(d);
                 console.log("coordinates", coordinates);
                 
@@ -265,9 +294,14 @@
                 tri_send.datum(coordinates)  
                     .transition()
                     .attr("d", line) 
-                    .attr("stroke", d => colorScale(d))
-                    .attr("fill", d => colorScale(d))            
+                    .attr("stroke", spider_colorScale(countryKey))
+                    .attr("fill", spider_colorScale(countryKey))            
             }
+
+
+
+
+
             
             function updateReceive (countryKey) {
                 const data = country_data[countryKey];
@@ -292,7 +326,7 @@
                 let d = data;
                 console.log("d",d);
                 
-                let color = 'gray';
+                
                 let coordinates = getPathCoordinates(d);
                 console.log("coordinates", coordinates);
                 
@@ -302,8 +336,8 @@
                 tri_receive.datum(coordinates)  
                     .transition()
                     .attr("d", line) 
-                    .attr("stroke", d => colorScale(d))
-                    .attr("fill", d => colorScale(d))            
+                    .attr("stroke", spider_colorScale(countryKey))
+                    .attr("fill", spider_colorScale(countryKey))            
               
             
             }
