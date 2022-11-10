@@ -13,7 +13,7 @@
             <h1 class = "title "> Migration Visualization</h1>
             <h1 class = "title "></h1>
         </div>
-        <svg id="chord" height="700" width="800" ></svg>
+        <svg id="chord" height="900" width="900" ></svg>
 
     <style> 
 
@@ -55,6 +55,10 @@
         height: 40;
         cursor: pointer;
 }
+
+    .chord-label {
+        font-size: 10;
+    }
         
     
 
@@ -112,7 +116,7 @@
               // Thickness of container
               let arcGen = d3.arc()
                     .innerRadius(radius)
-                    .outerRadius(radius + 40);
+                    .outerRadius(radius + 15);
               let ribbonGen = d3.ribbon()
                       .radius(radius);
               let chords = chordGen(matrix);
@@ -131,7 +135,17 @@
             
               rings.append("path")
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
-                   .attr("stroke", d => colorScale( nodes[ d.index ].SubContinent ))
+                   .attr("fill", function (d) {
+                    if (nodes[d.index].SubContinent == 'North America'   ){
+                       return ('orange');//colorScale( nodes[ d.index ].SubContinent );
+                     }
+                     if (nodes[d.index].SubContinent == 'East Asia'   ){
+                       return ("purple");//colorScale( nodes[ d.index ].SubContinent// );
+                     }
+
+                     else {return 'gray'}
+                   })
+                   //.attr("stroke", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("d", arcGen);
 
               // Ribbons
@@ -142,7 +156,17 @@
                       .attr("class","ribbon")
                       .attr("fill-opacity", 0.5)
                       .attr("stroke", "none")
-                      .attr("fill", d => colorScale( nodes[ d.source.index ].SubContinent ))
+                      .attr("fill", function (d) {
+                        if (nodes[d.source.index].SubContinent == 'North America'  ){
+                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+                     if (nodes[d.source.index].SubContinent == 'East Asia'   )
+                     {
+                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+
+                     else {return 'gray'}
+                      })
                       .attr("d", ribbonGen);
 
               // Label the Subcontinents
@@ -166,7 +190,8 @@
               rings.append('text')
                    .attr('transform', d=> d.trans)
                    .text(d => nodes[d.index].SubContinent)
-                   .attr('text-anchor', d => d.anchor);
+                   .attr('text-anchor', d => d.anchor)
+                   .attr('class','chord-label');
                 //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
