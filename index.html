@@ -8,14 +8,67 @@
     <body>
         <!-- First Visualization: Chord Diagram -->
         <!--<h1>Chord Graph Example</h1> -->
-        <svg id="chord" height="800" width="800" ></svg>
+        <div class = "banner" height = "100%"  width ="100%">
+            <h1 class = "title ">MIGRATION VISUALIZATION </h1>
+            <h1 class = "title "> Migration Visualization</h1>
+            <h1 class = "title "></h1>
+        </div>
+        <svg id="chord" height="700" width="800" ></svg>
+
+    <style> 
+
+    body {
+        background-color: rgb(234, 230, 222);
+        text-align: center;
+   
+    }
+
+    .title {
+        color: rgb(44, 69, 97);
+        stroke-width: 3;
+        font-size: 60;
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        font-style: oblique;
+    }
+
+    .banner {
+        margin-top: 15%;
+        margin-bottom: 10%;
+    }
+
+    .sub-title {
+        font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        color: rgb(44, 69, 97)
+        }
+    
+    .column {
+        flex-direction: column;
+        display: flex;
+    }
+    
+    .button {
+    
+        color: rgb(252, 252, 252);
+        border: 2px ;
+        border-radius: 8px;
+        width: 100;
+        height: 40;
+        cursor: pointer;
+}
+        
+    
+
+
+    </style>
+
+
         <script>
             const width = d3.select("#chord").attr("width");
             const height = d3.select("#chord").attr("height");
             const chordChart = d3.select("#chord").append("g");
             
             const drawChord = async () => {
-              const colorPalette = ["#48bf8e", "#075c62", "#a1def0", "#5e2a96", 
+            const colorPalette = ["#48bf8e", "#075c62", "#a1def0", "#5e2a96", 
                                     "#e775cc", "#f3c5fa", "#9a76af", "#1c4585", 
                                     "#479abc", "#94ea5b", "#1d6d1f", "#cddb9b", 
                                     "#604020", "#d48f4d", "#f24219", "#8e1023", 
@@ -122,22 +175,23 @@
         <!-- Second Visualization: Spider Diagram -->
        <!---<h1>Spider Diagram</h1> -->
         <p id = 'spider-chart'>
-
+        <div class = "column">
             <div id="send-bar">
-                <h3>Sending country:</h3>
+                <h3 class = 'sub-title'>Sending Country:</h3>
             </div>
             <div id="receive-bar">
-                <h3>Receiving country:</h3>
+                <h3 class = 'sub-title'>Receiving Country:</h3>
             </div>
-
-            <svg id="spider" height="650" width="650"></svg>
+        
+        </div>
+            <svg id="spider" height="800" width="800"></svg>
 
             
             <script>
             
             const features = ["Health","CO2 Emission","Civil Liberty"];
             const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
-            const country_colors = ['#5E1240','#134C5B','#E16425','#033148','#0D6D76','#C88477','#E6484B','#AAD9D1']
+            const country_colors = ['#5E1240','#3A394E','#E16425','#033148','#0D6D76','#C88477','#E6484B','#9292C2']
 
 
             let spider_colorScale = d3.scaleOrdinal()
@@ -168,23 +222,23 @@
             let annotations = svg.append("g").attr("id","annotations");
             
             let radialScale = d3.scaleLinear()
-                .domain([0,5])
-                .range([0,125]);
+                .domain([0,10])
+                .range([0,250]);
             let ticks = [2,4,6,8,10];
             
-            ticks.forEach(t =>
-                annotations.append("circle")
-                .attr("cx", 300)
-                .attr("cy", 300)
-                .attr("fill", "none")
-                .attr("stroke", "lightgray")
-                .attr("r", radialScale(t))
-            );
+            // ticks.forEach(t =>
+            //     annotations.append("circle")
+            //     .attr("cx", 300)
+            //     .attr("cy", 300)
+            //     .attr("fill", "none")
+            //     .attr("stroke", "lightgray")
+            //     .attr("r", radialScale(t))
+            // );
             
             function angleToCoordinate(angle, value){
                 let x = Math.cos(angle) * radialScale(value);
                 let y = Math.sin(angle) * radialScale(value);
-                return {"x": 300 + x, "y": 300 - y};
+                return {"x": 400 + x, "y": 400 - y};
             }
             
             for (var i = 0; i < features.length; i++) {
@@ -192,13 +246,13 @@
                 let ft_name = features[i];
                 let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
                 let line_coordinate = angleToCoordinate(angle, 10);
-                let label_coordinate = angleToCoordinate(angle, 10.5);
+                let label_coordinate = angleToCoordinate(angle, 11.5);
                 console.log(line_coordinate);
             
                 //draw axis line
                 annotations.append("line")
-                .attr("x1", 300)
-                .attr("y1", 300)
+                .attr("x1", 400)
+                .attr("y1", 400)
                 .attr("x2", line_coordinate.x)
                 .attr("y2", line_coordinate.y)
                 .attr("stroke","lightgray");
@@ -220,12 +274,10 @@
               .text(d)
               .style ("display" , "inline-block")
               .style("margin","4")
-              //.style ('text-decoration',"none")
-             // .style ("background-color",spider_colorScale(d) )
-            //   .style("stroke-width",10)
-            //   .style ("border-color", "white")
-            //   .attr ("opacity" , 0.5)
-            //   .style ("color" ,"white")
+              .style ("background-color",spider_colorScale(d))
+              .attr("class", "button")
+
+            
               .on('click', function(){
                 updateSend(d); 
             
@@ -236,6 +288,8 @@
               .append("button")
               .text(d)
               .style("margin","4")
+              .style ("background-color",spider_colorScale(d))
+              .attr("class", "button")
               .on('click', function(){
                 updateReceive(d);
             
