@@ -67,9 +67,10 @@
 
 
         <script>
-            const width = d3.select("#chord").attr("width");
-            const height = d3.select("#chord").attr("height");
-            const chordChart = d3.select("#chord").append("g");
+            const chordsvg = d3.select("#chord");
+            const width = chordsvg.attr("width");
+            const height = chordsvg.attr("height");
+            const chordChart = chordsvg.append("g");
             
             const drawChord = async () => {
             const colorPalette = ["#48bf8e", "#075c62", "#a1def0", "#5e2a96", 
@@ -107,6 +108,7 @@
               console.log("connections", connections);
 
               let radius = (width / 2.0) - 125;
+              // Draw chord
               let chordGen = d3.chord()
                     .padAngle(.04)
                     .sortSubgroups(d3.descending)
@@ -119,8 +121,6 @@
               let ribbonGen = d3.ribbon()
                       .radius(radius);
               let chords = chordGen(matrix);
-              
-              console.log("chords", chords);
 
               chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
               let colorScale = d3.scaleOrdinal().range(colorPalette);
@@ -131,6 +131,23 @@
                             .data(chords.groups)
                             .join("g")
                             .attr("class","segment");
+
+              // Mouse OVER
+              function onMouseOver(selected) {
+                  ribbons.filter( d => nodes[d.index] !== selected.index)
+                       .style("opacity", 0.3);
+
+                  chordsvg.selectAll(".ribbon")
+                       .filter( d => nodes[d.source.index] !== selected.index)
+                       .style("opacity", 0.3);
+              }
+              // Mouse OUT
+              function onMouseOut() {
+                  ribbons.style("opacity", 1);
+
+                  chordsvg.selectAll(".ribbon")
+                          .style("opacity", 1);
+              }
             
               rings.append("path")
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
@@ -156,17 +173,17 @@
                       .attr("fill-opacity", 0.5)
                       .attr("stroke", "none")
                       .attr("fill", function (d) {
-                        if (nodes[d.source.index].SubContinent == 'North America'  ){
-                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
-                     }
-                     if (nodes[d.source.index].SubContinent == 'East Asia'   )
-                     {
-                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
-                     }
-
-                     else {return 'gray'}
-                      })
-                      .attr("d", ribbonGen);
+                        if (nodes[d.source.index].SubContinent == 'North America'){
+                            return "green"//colorScale( nodes[ d.source.index ].SubContinent );
+                        }
+                        if (nodes[d.source.index].SubContinent == 'East Asia'){
+                            return "pink";//colorScale( nodes[ d.source.index ].SubContinent );
+                        }
+                        else {return 'gray'}
+                        })
+                      .attr("d", ribbonGen)
+                      .on("mouseover", onMouseOver)
+                      .on("mouseout", onMouseOut);
 
               // Label the Subcontinents
               chords.groups.forEach(d =>{
@@ -191,7 +208,6 @@
                    .text(d => nodes[d.index].Country)
                    .attr('text-anchor', d => d.anchor)
                    .attr('class','chord-label');
-                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
         </script>
