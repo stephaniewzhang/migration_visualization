@@ -78,13 +78,120 @@
                                     "#604020", "#d48f4d", "#f24219", "#8e1023", 
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
-              const edges_ds = await d3.json("edges.json");
-              const nodes_ds = await d3.json("nodes.json");
+              const edges_ds = await d3.json("edges_new.json");
+              const nodes_ds = await d3.json("nodes_new.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
               console.log("links",links);
               console.log("nodes",nodes);
+
+              let matrix = [];
+              let connections = {}; 
+              for (let i=0; i< Object.keys(nodes).length; i++) {
+                  let row = [];
+                  for (let j=0; j< Object.keys(nodes).length; j++) {row.push(0);}
+                  matrix.push(row);
+                  connections[i] = [i]; 
+              }
+              console.log("matrix", matrix);
+
+              Object.values(links).forEach( d => {
+                if (d.Weight > 0) {
+                      matrix[d.Source][d.Target] = d.Weight;
+                      matrix[d.Target][d.Source] = d.Weight;
+                      connections[d.Source].push(d.Target);
+                      connections[d.Target].push(d.Source);
+                }
+              });
+              console.log("connections", connections);
+
+              let radius = (width / 2.0) - 125;
+              let chordGen = d3.chord()
+                    .padAngle(.04)
+                    .sortSubgroups(d3.descending)
+                    .sortChords(d3.descending);
+
+              // Thickness of container
+              let arcGen = d3.arc()
+                    .innerRadius(radius)
+                    .outerRadius(radius + 15);
+              let ribbonGen = d3.ribbon()
+                      .radius(radius);
+              let chords = chordGen(matrix);
+              
+              console.log("chords", chords);
+
+              chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
+              let colorScale = d3.scaleOrdinal().range(colorPalette);
+
+              // Circular Container
+              let ringContainer = chordChart.append("g");
+              let rings = ringContainer.selectAll("g.segment")
+                            .data(chords.groups)
+                            .join("g")
+                            .attr("class","segment");
+            
+              rings.append("path")
+                   .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
+                   .attr("fill", function (d) {
+                    if (nodes[d.index].SubContinent == 'North America'   ){
+                       return ('orange');//colorScale( nodes[ d.index ].SubContinent );
+                     }
+                     if (nodes[d.index].SubContinent == 'East Asia'   ){
+                       return ("purple");//colorScale( nodes[ d.index ].SubContinent// );
+                     }
+
+                     else {return 'gray'}
+                   })
+                   //.attr("stroke", d => colorScale( nodes[ d.index ].SubContinent ))
+                   .attr("d", arcGen);
+
+              // Ribbons
+              let ribbonContainer = chordChart.append("g");
+              let ribbons = ribbonContainer.selectAll("path.ribbon")
+                      .data(chords)
+                      .join("path")
+                      .attr("class","ribbon")
+                      .attr("fill-opacity", 0.5)
+                      .attr("stroke", "none")
+                      .attr("fill", function (d) {
+                        if (nodes[d.source.index].SubContinent == 'North America'  ){
+                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+                     if (nodes[d.source.index].SubContinent == 'East Asia'   )
+                     {
+                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+
+                     else {return 'gray'}
+                      })
+                      .attr("d", ribbonGen);
+
+              // Label the Subcontinents
+              chords.groups.forEach(d =>{
+                  let transform = '';
+                  // find midpoint, convert to degrees
+                  let midpoint = (d.startAngle + d.endAngle) / 2;
+                  let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+                  //2PI*unit radius = 360, PI*unit = 180
+                  transform = transform + ` rotate(${rotation})`;
+                  transform = transform + ` translate(${radius+25}, 0)`;
+                  d.anchor = 'middle'
+                  //if (rotation > 90) {
+                      transform = transform + ' rotate(90)';
+                      // Notice text anchor issue that also first
+                      d.anchor = "middle";
+                 // }
+                  d.trans = transform;
+              });
+              
+              rings.append('text')
+                   .attr('transform', d=> d.trans)
+                   .text(d => nodes[d.index].Country)
+                   .attr('text-anchor', d => d.anchor)
+                   .attr('class','chord-label');
+                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
         </script>
