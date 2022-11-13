@@ -8,12 +8,20 @@
     <body>
         <!-- First Visualization: Chord Diagram -->
         <!--<h1>Chord Graph Example</h1> -->
-        <div class = "banner" height = "100%"  width ="100%">
-            <h1 class = "title ">MIGRATION VISUALIZATION </h1>
-            <h1 class = "title "> Migration Visualization</h1>
-            <h1 class = "title "></h1>
-        </div>
-        <svg id="chord" height="900" width="900" ></svg>
+    <div class = "banner" height = "100%"  width ="100%">
+        <h1 class = "title ">MIGRATION VISUALIZATION </h1>
+        <h1 class = "title "> Migration Visualization</h1>
+        <h1 class = "title "></h1>
+    </div>
+    <div class = "main"  width ="100%">
+        <svg id="chord" height="800" width="800" ></svg>
+        <svg id="spider" height="700" width="600"></svg>
+    </div>
+
+    <div id = 'bar-container'>
+        <svg id='bar' height = "300" width = '650'></svg>
+        <svg id='bar2' height = "300" width = '650'></svg>
+    </div>
 
     <style> 
 
@@ -59,6 +67,9 @@
     .chord-label {
         font-size: 10;
     }
+
+   
+ 
         
     
 
@@ -173,17 +184,24 @@
                       .attr("fill-opacity", 0.5)
                       .attr("stroke", "none")
                       .attr("fill", function (d) {
-                        if (nodes[d.source.index].SubContinent == 'North America'){
-                            return "green"//colorScale( nodes[ d.source.index ].SubContinent );
-                        }
-                        if (nodes[d.source.index].SubContinent == 'East Asia'){
-                            return "pink";//colorScale( nodes[ d.source.index ].SubContinent );
-                        }
-                        else {return 'gray'}
-                        })
+                        if (nodes[d.source.index].SubContinent == 'North America'  ){
+                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+                     if (nodes[d.source.index].SubContinent == 'East Asia'   )
+                     {
+                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
+                     }
+
+                     else {return 'gray'}
+                      })
                       .attr("d", ribbonGen)
-                      .on("mouseover", onMouseOver)
-                      .on("mouseout", onMouseOut);
+                      .attr("cursor", function (d) {
+                        if (nodes[d.source.index].SubContinent == 'North America'  )
+                        {return 'pointer'}
+                        if (nodes[d.source.index].SubContinent == 'East Asia'  )
+                        {return 'pointer'}
+                      });
+                      //"pointer");
 
               // Label the Subcontinents
               chords.groups.forEach(d =>{
@@ -203,11 +221,13 @@
                   d.trans = transform;
               });
               
+
               rings.append('text')
                    .attr('transform', d=> d.trans)
-                   .text(d => nodes[d.index].Country)
+                   .text(d => nodes[d.index].SubContinent)
                    .attr('text-anchor', d => d.anchor)
                    .attr('class','chord-label');
+                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
         </script>
@@ -224,12 +244,13 @@
             </div>
         
         </div>
-            <svg id="spider" height="800" width="800"></svg>
+            
 
             
             <script>
             
-            const features = ["Health","CO2 Emission","Civil Liberty"];
+            const features = ["Healthcare Access and Quality Index","Annual CO2 Emission","Civil Liberty"];
+            const units = [' ','Tonnes Per Capita',' ']
             const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
             const country_colors = ['#5E1240','#3A394E','#E16425','#033148','#0D6D76','#C88477','#E6484B','#9292C2']
 
@@ -241,18 +262,20 @@
 
             
             country_data = {
-            'China': {'Health': 6.2, 'CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
-            'Japan': {'Health': 9.02, 'CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
-            'South Korea': {'Health': 8.3, 'CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
-            'North Korea': {'Health': 4.78, 'CO2 Emission': 0.0, 'Civil Liberty': 3}, 
-            'Taiwan': {'Health': 7.8, 'CO2 Emission': 4.87011075125133, 'Civil Liberty': 9}, 
-            'Mongolia': {'Health': 4.72, 'CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
-            'United States': {'Health': 8.73, 'CO2 Emission': 10.0, 'Civil Liberty': 9},
-            'Canada': {'Health': 9.12, 'CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
+            'China': {'Healthcare Access and Quality Index': 6.2, 'Annual CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
+            'Japan': {'Healthcare Access and Quality Index': 9.02, 'Annual CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
+            'South Korea': {'Healthcare Access and Quality Index': 8.3, 'Annual CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
+            'North Korea': {'Healthcare Access and Quality Index': 4.78, 'Annual CO2 Emission': 0.0, 'Civil Liberty': 3}, 
+            'Taiwan': {'Healthcare Access and Quality Index': 7.8, 'Annual CO2 Emission': 4.87011075125133, 'Civil Liberty': 9}, 
+            'Mongolia': {'Healthcare Access and Quality Index': 4.72, 'Annual CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
+            'United States': {'Healthcare Access and Quality Index': 8.73, 'Annual CO2 Emission': 10.0, 'Civil Liberty': 9},
+            'Canada': {'Healthcare Access and Quality Index': 9.12, 'Annual CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
             console.log(country_data)
             
             allKeys = Object.keys(country_data);
             console.log("allkeys", allKeys);
+            allValues = Object.values(country_data);
+            console.log("allvalues", allValues);
                             
             const svg = d3.select("svg#spider");
             const spider_width = svg.attr("width");
@@ -263,22 +286,22 @@
             
             let radialScale = d3.scaleLinear()
                 .domain([0,10])
-                .range([0,250]);
+                .range([0,200]);
             let ticks = [2,4,6,8,10];
             
-            // ticks.forEach(t =>
-            //     annotations.append("circle")
-            //     .attr("cx", 300)
-            //     .attr("cy", 300)
-            //     .attr("fill", "none")
-            //     .attr("stroke", "lightgray")
-            //     .attr("r", radialScale(t))
-            // );
+            ticks.forEach(t =>
+                annotations.append("circle")
+                .attr("cx", 300)
+                .attr("cy", 350)
+                .attr("fill", "none")
+                .attr("stroke", "lightgray")
+                .attr("r", radialScale(t))
+            );
             
             function angleToCoordinate(angle, value){
                 let x = Math.cos(angle) * radialScale(value);
                 let y = Math.sin(angle) * radialScale(value);
-                return {"x": 400 + x, "y": 400 - y};
+                return {"x": 300 + x, "y": 350 - y};
             }
             
             for (var i = 0; i < features.length; i++) {
@@ -286,13 +309,40 @@
                 let ft_name = features[i];
                 let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
                 let line_coordinate = angleToCoordinate(angle, 10);
-                let label_coordinate = angleToCoordinate(angle, 11.5);
+                let label_coordinate = angleToCoordinate(angle, 11.6);
                 console.log(line_coordinate);
+
+
+                let transform = ''  
+                let midpoint = (angle) / 2;
+                let rotation = ( midpoint ) * ( 180 / Math.PI ) ;
+                transform = transform + ` rotate(${rotation})`;
+                transform = transform + ` translate(${300}, 0)`;
+
+                
+
+
+            //     chords.groups.forEach(d =>{
+            //       let transform = '';
+            //       // find midpoint, convert to degrees
+            //       let midpoint = (d.startAngle + d.endAngle) / 2;
+            //       let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+            //       //2PI*unit radius = 360, PI*unit = 180
+            //       transform = transform + ` rotate(${rotation})`;
+            //       transform = transform + ` translate(${radius+25}, 0)`;
+            //       d.anchor = 'middle'
+            //       //if (rotation > 90) {
+            //           transform = transform + ' rotate(90)';
+            //           // Notice text anchor issue that also first
+            //           d.anchor = "middle";
+            //      // }
+            //       d.trans = transform;
+            //   });
             
                 //draw axis line
                 annotations.append("line")
-                .attr("x1", 400)
-                .attr("y1", 400)
+                .attr("x1", 300)
+                .attr("y1", 350)
                 .attr("x2", line_coordinate.x)
                 .attr("y2", line_coordinate.y)
                 .attr("stroke","lightgray");
@@ -300,12 +350,16 @@
                 //draw axis label
                 annotations.append("text")
                 .attr("x", label_coordinate.x)
-                .attr("y", label_coordinate.y)
+                .attr("y", line_coordinate.y)
+                .attr("transform", transform.ft_name)
                 .text(ft_name)
-                .attr("stroke","gray")
+                
                 .attr("fill","gray");
 
             }
+
+
+    
             
             allKeys.forEach( d => {
             
@@ -348,52 +402,119 @@
                              .attr("stroke-opacity", 1)
                              .attr("opacity", 0.7);
             
-            
+
+            console.log("spider_colorScale", spider_colorScale);   
             
 
+        //Bar Plot canvas
+        const svgBar = d3.select("svg#bar")
 
-            console.log("spider_colorScale", spider_colorScale);            
+        let diagrams =  svgBar.append('g').attr('id','bar_diagrams');
+
+        const bar_width = 600;
+        const bar_height = 200;
+        console.log(bar_width);
+
+        var x = d3.scaleLinear().domain([0,10]).range([0,bar_width]);
+
+        var y = d3.scaleBand()
+                  .range([ 0, 200 ])
+                  .domain(features)
+                  .padding(.3);
+
+        const svgBar2 = d3.select("svg#bar2")
+        let diagrams2 =  svgBar2.append('g').attr('id','bar_diagrams2');
+
+        const bar2_width = 600;
+        const bar2_height = 200;
+
             
             
-            function updateSend (countryKey) {
-                const data = country_data[countryKey];
+        function updateSend (countryKey) {
+        const data = country_data[countryKey];
+        
+        console.log("data",data)
             
-                    console.log("data",data)
-                
+        
+        let line = d3.line()
+            .x(d => d.x)
+            .y(d => d.y);
+        
+        
+        function getPathCoordinates(data_point){
+        let coordinates = [];
+            for (var i = 0; i < features.length; i++){
+                let ft_name = features[i];
             
-            let line = d3.line()
-                .x(d => d.x)
-                .y(d => d.y);
-            
-            
-            function getPathCoordinates(data_point){
-            let coordinates = [];
-                for (var i = 0; i < features.length; i++){
-                    let ft_name = features[i];
-                
-                    let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
-                    coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
-                }
-                return coordinates;
+                let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
+                coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
             }
+            return coordinates;
+        }
+        
+            let d = data;
+            console.log("d",d);
             
-                let d = data;
-                console.log("d",d);
-                
-                
-                let coordinates = getPathCoordinates(d);
-                console.log("coordinates", coordinates);
-                
-                //draw the path element
-                tri_send.datum(coordinates)  
-                    .transition()
-                    .attr("d", line) 
-                    .attr("stroke", spider_colorScale(countryKey))
-                    .attr("fill", spider_colorScale(countryKey))            
+            
+            let coordinates = getPathCoordinates(d);
+            console.log("coordinates", coordinates);
+            
+            //draw the path element
+            tri_send.datum(coordinates)  
+                .transition()
+                .attr("d", line) 
+                .attr("stroke", spider_colorScale(countryKey))
+                .attr("fill", spider_colorScale(countryKey))  
+                            
+        
+
+        for (var i=0; i<features.length;i++){
+            let ft_name = features[i];
+            let unit = units[i]
+            console.log(ft_name)
+            console.log(d[ft_name])
+            diagrams.append('rect')
+                .attr('id','default_bar')
+                .attr('x',0)
+                .attr('y',y(ft_name))
+                .attr('width',550)
+                .attr('height',y.bandwidth())
+                .attr('fill','rgb(187, 187, 187)')
+                .attr('rx','5')
+
+
+            diagrams.append('rect')
+                .attr('x',550-x(d[ft_name]))
+                .attr('y',y(ft_name))
+                .attr('width',x(d[ft_name]))
+                .attr('height',y.bandwidth())
+                .attr('fill',spider_colorScale(countryKey))
+                .attr('rx','5')
+            if ((ft_name) == 'Annual CO2 Emission'){
+            diagrams.append('text')
+                    .text(d[ft_name].toFixed(2) + ' ' +unit)
+                    .attr('x',470)
+                    .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
+                    .attr('fill','white')
+                    .attr("text-anchor", "start")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "25px")
+            }else{
+            diagrams.append('text')
+                    .text(d[ft_name].toFixed(2) + ' ' +unit)
+                    .attr('x',680)
+                    .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
+                    .attr('fill','white')
+                    .attr("text-anchor", "start")
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "25px")
             }
 
 
+        }
 
+
+    }
 
 
             
@@ -431,7 +552,40 @@
                     .transition()
                     .attr("d", line) 
                     .attr("stroke", spider_colorScale(countryKey))
-                    .attr("fill", spider_colorScale(countryKey))            
+                    .attr("fill", spider_colorScale(countryKey))    
+                    
+                              //draw bar Plot
+               for (var i=0; i<features.length;i++){
+                 let ft_name = features[i];
+                 let unit = units[i]
+                 console.log(ft_name)
+                 console.log(d[ft_name])
+                 diagrams2.append('rect')
+                       .attr('id','default_bar')
+                       .attr('x',0)
+                       .attr('y',y(ft_name))
+                       .attr('width',750)
+                       .attr('height',y.bandwidth())
+                       .attr('fill','rgb(187, 187, 187)')
+                       .attr('rx','5')
+
+
+                 diagrams2.append('rect')
+                       .attr('x',0)
+                       .attr('y',y(ft_name))
+                       .attr('width',x(d[ft_name]))
+                       .attr('height',y.bandwidth())
+                       .attr('fill',spider_colorScale(countryKey))
+                       .attr('rx','5')
+                diagrams2.append('text')
+                       .text(ft_name.toUpperCase()+' : ' + d[ft_name].toFixed(2) + ' ' +unit)
+                       .attr('x',5)
+                       .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
+                       .attr('fill','white')
+                       .attr("text-anchor", "start")
+                       .attr("font-family", "sans-serif")
+                       .attr("font-size", "25px")
+               }
               
             
             }
