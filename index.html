@@ -2,7 +2,7 @@
     <head>
         <title>Visualization</title>
 
-        <link rel="stylesheet" type="text/css" href="../css/styles.css">
+        
         <script src="https://d3js.org/d3.v7.min.js"></script>
     </head>
     <body>
@@ -132,9 +132,15 @@
               let chords = chordGen(matrix);
               
               console.log("chords", chords);
+              console.log("chords-group", chords.groups);
+
+              console.log("country",nodes['0'].Country )
 
               chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
               let colorScale = d3.scaleOrdinal().range(colorPalette);
+
+
+
 
               // Circular Container
               let ringContainer = chordChart.append("g");
@@ -147,7 +153,7 @@
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("fill", function (d) {
                     if (nodes[d.index].SubContinent == 'North America'   ){
-                       return ('orange');//colorScale( nodes[ d.index ].SubContinent );
+                       return ("Orange");//colorScale( nodes[ d.index ].Country );
                      }
                      if (nodes[d.index].SubContinent == 'East Asia'   ){
                        return ("purple");//colorScale( nodes[ d.index ].SubContinent// );
@@ -163,16 +169,22 @@
               let ribbons = ribbonContainer.selectAll("path.ribbon")
                       .data(chords)
                       .join("path")
-                      .attr("class","ribbon")
+                      .attr("class", function(d) {
+                        if (nodes[d.source.index].SubContinent == 'North America'  )
+                        {return 'clickable'}
+                        if (nodes[d.source.index].SubContinent == 'East Asia'  )
+                        {return 'clickable'} 
+                        else {return "unclickable"}
+                      })
                       .attr("fill-opacity", 0.5)
                       .attr("stroke", "none")
                       .attr("fill", function (d) {
                         if (nodes[d.source.index].SubContinent == 'North America'  ){
-                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
+                       return ('orange') //colorScale( nodes[ d.source.index ].SubContinent );
                      }
                      if (nodes[d.source.index].SubContinent == 'East Asia'   )
                      {
-                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
+                       return ('purble')//colorScale( nodes[ d.source.index ].SubContinent );
                      }
 
                      else {return 'gray'}
@@ -184,14 +196,16 @@
                         if (nodes[d.source.index].SubContinent == 'East Asia'  )
                         {return 'pointer'}
                       })
-                      //"pointer");
+       
+            
+                      
 
               // Label the Subcontinents
               chords.groups.forEach(d =>{
                   let transform = '';
                   // find midpoint, convert to degrees
                   let midpoint = (d.startAngle + d.endAngle) / 2;
-                  let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+                  let rotation = ( midpoint ) * ( 180 / Math.PI ) -90 ;
                   //2PI*unit radius = 360, PI*unit = 180
                   transform = transform + ` rotate(${rotation})`;
                   transform = transform + ` translate(${radius+25}, 0)`;
@@ -207,7 +221,7 @@
 
               rings.append('text')
                    .attr('transform', d=> d.trans)
-                   .text(d => nodes[d.index].SubContinent)
+                   .text(d => nodes[d.index].Country)
                    .attr('text-anchor', d => d.anchor)
                    .attr('class','chord-label');
 
@@ -344,7 +358,7 @@
             }
 
 
-    
+
             
             allKeys.forEach( d => {
             
@@ -355,8 +369,6 @@
               .style("margin","4")
               .style ("background-color",spider_colorScale(d))
               .attr("class", "button")
-
-            
               .on('click', function(){
                 updateSend(d); 
             
