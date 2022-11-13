@@ -14,7 +14,7 @@
         <h1 class = "title "></h1>
     </div>
     <div class = "main"  width ="100%">
-        <svg id="chord" height="700" width="650" ></svg>
+        <svg id="chord" height="800" width="800" ></svg>
         <svg id="spider" height="700" width="600"></svg>
     </div>
 
@@ -89,15 +89,14 @@
                                     "#604020", "#d48f4d", "#f24219", "#8e1023", 
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
-              const edges_ds = await d3.json("edges.json");
-              const nodes_ds = await d3.json("nodes.json");
+              const edges_ds = await d3.json("edges_new.json");
+              const nodes_ds = await d3.json("nodes_new.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
+              console.log("links",links);
+              console.log("nodes",nodes);
 
-              console.log("links", links);
-              console.log("nodes", nodes);
-              
               let matrix = [];
               let connections = {}; 
               for (let i=0; i< Object.keys(nodes).length; i++) {
@@ -205,12 +204,15 @@
                   d.trans = transform;
               });
               
-            //   rings.append('text')
-            //        .attr('transform', d=> d.trans)
-            //        .text(d => nodes[d.index].SubContinent)
-            //        .attr('text-anchor', d => d.anchor)
-            //        .attr('class','chord-label');
-                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
+
+              rings.append('text')
+                   .attr('transform', d=> d.trans)
+                   .text(d => nodes[d.index].SubContinent)
+                   .attr('text-anchor', d => d.anchor)
+                   .attr('class','chord-label');
+
+
+                
             }
             drawChord();
         </script>
@@ -275,7 +277,7 @@
             ticks.forEach(t =>
                 annotations.append("circle")
                 .attr("cx", 300)
-                .attr("cy", 380)
+                .attr("cy", 350)
                 .attr("fill", "none")
                 .attr("stroke", "lightgray")
                 .attr("r", radialScale(t))
@@ -284,7 +286,7 @@
             function angleToCoordinate(angle, value){
                 let x = Math.cos(angle) * radialScale(value);
                 let y = Math.sin(angle) * radialScale(value);
-                return {"x": 300 + x, "y": 380 - y};
+                return {"x": 300 + x, "y": 350 - y};
             }
             
             for (var i = 0; i < features.length; i++) {
@@ -325,7 +327,7 @@
                 //draw axis line
                 annotations.append("line")
                 .attr("x1", 300)
-                .attr("y1", 380)
+                .attr("y1", 350)
                 .attr("x2", line_coordinate.x)
                 .attr("y2", line_coordinate.y)
                 .attr("stroke","lightgray");
