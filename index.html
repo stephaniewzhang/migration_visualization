@@ -88,8 +88,8 @@
                                     "#604020", "#d48f4d", "#f24219", "#8e1023", 
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
-              const edges_ds = await d3.json("edges_new.json");
-              const nodes_ds = await d3.json("nodes_final.json");
+              const edges_ds = await d3.json("edges_final.json");
+              const nodes_ds = await d3.json("nodes_vfinal.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
@@ -189,7 +189,7 @@
                       .attr("d", ribbonGen)
                       .attr("cursor", function(d){
                         if (nodes[d.source.index].SubContinent == 'North America'){
-                                return "pointer"
+                                return "pointer";
                             }
                             if (nodes[d.source.index].SubContinent == 'East Asia'   ){
                                 return "pointer";
