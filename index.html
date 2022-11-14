@@ -151,22 +151,6 @@
                             .join("g")
                             .attr("class","segment");
 
-              // Mouse OVER
-              function onMouseOver(selected) {
-                  ribbons.filter( d => nodes[d.index] !== selected.index)
-                       .style("opacity", 0.3);
-
-                  chordsvg.selectAll(".ribbon")
-                       .filter( d => nodes[d.source.index] !== selected.index)
-                       .style("opacity", 0.3);
-              }
-              // Mouse OUT
-              function onMouseOut() {
-                  ribbons.style("opacity", 1);
-
-                  chordsvg.selectAll(".ribbon")
-                          .style("opacity", 1);
-              }
             
               rings.append("path")
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
@@ -188,13 +172,7 @@
               let ribbons = ribbonContainer.selectAll("path.ribbon")
                       .data(chords)
                       .join("path")
-                      .attr("class", function(d) {
-                        if (nodes[d.source.index].SubContinent == 'North America'  )
-                        {return 'clickable'}
-                        if (nodes[d.source.index].SubContinent == 'East Asia'  )
-                        {return 'clickable'} 
-                        else {return "unclickable"}
-                      })
+                      .attr("class", "ribbon")
                       .attr("fill-opacity", 0.5)
                       .attr("stroke", "none")
                       .attr("fill", function (d) {
@@ -214,6 +192,7 @@
                         {return 'pointer'}
                         if (nodes[d.source.index].SubContinent == 'East Asia'  )
                         {return 'pointer'}
+                    
 
        
             
