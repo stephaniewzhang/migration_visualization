@@ -145,6 +145,7 @@
 
               // Mouse OVER
               function onMouseOver(selected) {
+                  console.log(selected)
                   ribbons.filter( d => nodes[d.index] !== selected.index)
                        .style("opacity", 0.3);
 
@@ -185,22 +186,22 @@
                       .attr("stroke", "none")
                       .attr("fill", function (d) {
                         if (nodes[d.source.index].SubContinent == 'North America'  ){
-                       return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
-                     }
-                     if (nodes[d.source.index].SubContinent == 'East Asia'   )
-                     {
-                       return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
-                     }
-
-                     else {return 'gray'}
-                      })
+                            return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
+                        }
+                        if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                            return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
+                        }
+                        else {return 'gray'}
+                        })
                       .attr("d", ribbonGen)
-                      .attr("cursor", function (d) {
-                        if (nodes[d.source.index].SubContinent == 'North America'  )
-                        {return 'pointer'}
-                        if (nodes[d.source.index].SubContinent == 'East Asia'  )
-                        {return 'pointer'}
-                      });
+                      .on("mouseover", d => onMouseOver(d.source))
+                      .on("mouseout", d => onMouseOut(d.source));
+                    //   .attr("cursor", function (d) {
+                    //     if (nodes[d.source.index].SubContinent == 'North America'  )
+                    //     {return 'pointer'}
+                    //     if (nodes[d.source.index].SubContinent == 'East Asia'  )
+                    //     {return 'pointer'}
+                    //   });
                       //"pointer");
 
               // Label the Subcontinents
