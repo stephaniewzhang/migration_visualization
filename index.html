@@ -159,7 +159,15 @@
                     }
                      else {return 'gray'}
                    })
-                   .attr("d", arcGen);
+                   .attr("d", arcGen)
+                   .attr("cursor", function(d){
+                        if (nodes[d.index].SubContinent == 'North America'){
+                                return "pointer"
+                            }
+                            if (nodes[d.index].SubContinent == 'East Asia'   ){
+                                return "pointer";
+                            }
+                      });
 
               // Ribbons
               let ribbonContainer = chordChart.append("g");
@@ -168,7 +176,7 @@
                       .join("path")
                       .attr("class","ribbon")
                         .attr("fill-opacity", 0.5)
-                        .attr("stroke", "none")
+                        .style("stroke", 'none')
                         .attr("fill", function (d) {
                             if (nodes[d.source.index].SubContinent == 'North America'){
                                 return "orange"
@@ -178,7 +186,15 @@
                             }
                             else {return 'gray'}
                             })
-                      .attr("d", ribbonGen);
+                      .attr("d", ribbonGen)
+                      .attr("cursor", function(d){
+                        if (nodes[d.source.index].SubContinent == 'North America'){
+                                return "pointer"
+                            }
+                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                                return "pointer";
+                            }
+                      });
                 
 
               // Label the Subcontinents
@@ -204,15 +220,27 @@
 
                 // Hovering and Interactivity
                 function restoreHighlights() {
-                    rings.attr("opacity", 1); 
-                    ribbons.attr("opacity", 1);
-                }
+                    rings.attr("opacity", 1)
+                    ribbons.attr("opacity", 1).style("stroke","none")
+
+                    ribbons.attr("fill", function (d){
+                    if (nodes[d.source.index].SubContinent == 'North America'){
+                                return "orange"
+                            }
+                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                                return "purple";
+                            }
+                            else {return 'gray'}
+
+                })
+            }
+
                 function lowlightAll() {
                     rings.attr("opacity", 0.2);
                     ribbons.attr("opacity", 0.2);
                 }
                 function highlightRings(index) {
-                    console.log(index);
+                    //console.log(index)
                     let targetSegments = rings.filter( d => {
                         return connections[d.index].includes(index);
                     });
@@ -221,11 +249,22 @@
 
 
                 function highlightRibbons(index) {
+                    //console.log(index)
                     let targetRibbons = ribbons.filter( d => {
                         return d.source.index === index || d.target.index === index;
                     });
-                    targetRibbons.attr("opacity",1);
+                    targetRibbons.attr("opacity",1)
+
                 }
+
+                //Add Stroke Interactivity
+                function addcolor (sourceindex,targetindex) {
+                    let strokeRibbons = ribbons.filter( d => {
+                        return d.source.index === sourceindex && d.target.index === targetindex;
+                    });
+                    strokeRibbons.style('stroke','white').style("stroke-width",3)
+                } 
+
                 
                 // Ring Hovering feature add
                 rings.on("mouseout", restoreHighlights)
@@ -241,6 +280,49 @@
                             highlightRibbons(d.index);
                         }
                     });
+
+
+        // const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
+
+        
+        // for (i in country_names) {
+        //      for (j in country_names) {
+        //         ribbons.on("mouseout", restoreHighlights)
+        //                .on("mouseover", function (event,d){
+        //                    if (nodes[d.source.index].Country == i && nodes[d.target.index].Country == j ){
+        //                     addcolor(d.source.index,d.target.index)
+                        
+        //             }})
+        // }}
+
+            //Ribbons stroke add
+            ribbons.on("mouseout", restoreHighlights)
+                       .on("mouseover", function (event,d){
+                           if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "China" ){
+                            addcolor(d.source.index,d.target.index)}
+                           if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "South Korea" ){
+                            addcolor(d.source.index,d.target.index)}
+                           });
+
+        
+
+             ribbons.on("click", function(event,d){
+                if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "China" ){
+                            console.log(nodes[d.source.index].Country, nodes[d.target.index].Country )
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "South Korea" ){
+                console.log(nodes[d.source.index].Country, nodes[d.target.index].Country )
+                updateSend(nodes[d.source.index].Country)
+                updateReceive(nodes[d.target.index].Country)}
+    
+           });
+
+        //      }}
+        
+
+
                 
                 chords.groups.forEach( d => {
                     let transform = '';
