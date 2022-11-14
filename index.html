@@ -89,7 +89,7 @@
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
               const edges_ds = await d3.json("edges_final.json");
-              const nodes_ds = await d3.json("nodes_vfinal.json");
+              const nodes_ds = await d3.json("nodes.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
@@ -108,10 +108,10 @@
 
               Object.values(links).forEach( d => {
                 if (d.Weight > 0) {
-                      matrix[d.Source][d.Target] = d.Weight;
-                      matrix[d.Target][d.Source] = d.Weight;
-                      connections[d.Source].push(d.Target);
-                      connections[d.Target].push(d.Source);
+                    matrix[d.Source][d.Target] = d.Weight;
+                    matrix[d.Target][d.Source] = d.Weight;
+                    connections[d.Source].push(d.Target);
+                    connections[d.Target].push(d.Source);
                 }
               });
               console.log("connections", connections);
@@ -197,23 +197,24 @@
                       });
                 
 
-              // Label the Subcontinents
-              chords.groups.forEach(d =>{
-                  let transform = '';
-                  // find midpoint, convert to degrees
-                  let midpoint = (d.startAngle + d.endAngle) / 2;
-                  let rotation = ( midpoint ) * ( 180 / Math.PI ) -90 ;
-                  //2PI*unit radius = 360, PI*unit = 180
-                  transform = transform + ` rotate(${rotation})`;
-                  transform = transform + ` translate(${radius+25}, 0)`;
-                  d.anchor = 'middle'
-                  //if (rotation > 90) {
-                      transform = transform + ' rotate(90)';
-                      // Notice text anchor issue that also first
-                      d.anchor = "middle";
-                 // }
-                  d.trans = transform;
-              });
+                // Label the Subcontinents -- Please don't change this :')
+                chords.groups.forEach( d => {
+                    let transform = '';
+                    let midpoint = (d.startAngle + d.endAngle) / 2;
+                    let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+                    transform = transform + ` rotate(${rotation})`;
+                    transform = transform + ` translate(${radius+25}, 0)`;
+                    if (rotation > 90) {
+                        transform = transform + ' rotate(180)';
+                        d.anchor = "end";
+                    }
+                    d.trans = transform;
+                });
+
+                    rings.append("text")
+                        .attr("transform", d => d.trans)
+                        .text(d => nodes[ d.index ].Name )
+                        .attr("text-anchor", d => d.anchor);
               
 
 
