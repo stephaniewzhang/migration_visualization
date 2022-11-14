@@ -65,7 +65,7 @@
 }
 
     .chord-label {
-        font-size: 10;
+        font-size: 12;
     }
 
    
@@ -75,8 +75,6 @@
 
 
     </style>
-
-
         <script>
             const chordsvg = d3.select("#chord");
             const width = chordsvg.attr("width");
@@ -91,7 +89,7 @@
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
               const edges_ds = await d3.json("edges_new.json");
-              const nodes_ds = await d3.json("nodes_new.json");
+              const nodes_ds = await d3.json("nodes_final.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
@@ -132,6 +130,7 @@
               let ribbonGen = d3.ribbon()
                       .radius(radius);
               let chords = chordGen(matrix);
+              console.log("chords", chords);
 
               chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
               let colorScale = d3.scaleOrdinal().range(colorPalette);
@@ -143,37 +142,17 @@
                             .join("g")
                             .attr("class","segment");
 
-              // Mouse OVER
-              function onMouseOver(selected) {
-                  console.log(selected)
-                  ribbons.filter( d => nodes[d.index] !== selected.index)
-                       .style("opacity", 0.3);
-
-                  chordsvg.selectAll(".ribbon")
-                       .filter( d => nodes[d.source.index] !== selected.index)
-                       .style("opacity", 0.3);
-              }
-              // Mouse OUT
-              function onMouseOut() {
-                  ribbons.style("opacity", 1);
-
-                  chordsvg.selectAll(".ribbon")
-                          .style("opacity", 1);
-              }
-            
               rings.append("path")
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("fill", function (d) {
-                    if (nodes[d.index].SubContinent == 'North America'   ){
-                       return ('orange');//colorScale( nodes[ d.index ].SubContinent );
-                     }
-                     if (nodes[d.index].SubContinent == 'East Asia'   ){
-                       return ("purple");//colorScale( nodes[ d.index ].SubContinent// );
-                     }
-
+                    if (nodes[d.index].SubContinent == 'North America'){
+                       return ('orange');
+                    }
+                    if (nodes[d.index].SubContinent == 'East Asia'){
+                       return ("purple");
+                    }
                      else {return 'gray'}
                    })
-                   //.attr("stroke", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("d", arcGen);
 
               // Ribbons
@@ -181,54 +160,78 @@
               let ribbons = ribbonContainer.selectAll("path.ribbon")
                       .data(chords)
                       .join("path")
-                      .attr("class","ribbon")
-                      .attr("fill-opacity", 0.5)
-                      .attr("stroke", "none")
-                      .attr("fill", function (d) {
-                        if (nodes[d.source.index].SubContinent == 'North America'  ){
-                            return "orange"//colorScale( nodes[ d.source.index ].SubContinent );
-                        }
-                        if (nodes[d.source.index].SubContinent == 'East Asia'   ){
-                            return "purple";//colorScale( nodes[ d.source.index ].SubContinent );
-                        }
-                        else {return 'gray'}
-                        })
-                      .attr("d", ribbonGen)
-                      .on("mouseover", d => onMouseOver(d.source))
-                      .on("mouseout", d => onMouseOut(d.source));
-                    //   .attr("cursor", function (d) {
-                    //     if (nodes[d.source.index].SubContinent == 'North America'  )
-                    //     {return 'pointer'}
-                    //     if (nodes[d.source.index].SubContinent == 'East Asia'  )
-                    //     {return 'pointer'}
-                    //   });
-                      //"pointer");
+                        .attr("class","ribbon")
+                        .attr("fill-opacity", 0.5)
+                        .attr("stroke", "none")
+                        .attr("fill", function (d) {
+                            if (nodes[d.source.index].SubContinent == 'North America'){
+                                return "orange"
+                            }
+                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                                return "purple";
+                            }
+                            else {return 'gray'}
+                            })
+                      .attr("d", ribbonGen);
 
-              // Label the Subcontinents
-              chords.groups.forEach(d =>{
-                  let transform = '';
-                  // find midpoint, convert to degrees
-                  let midpoint = (d.startAngle + d.endAngle) / 2;
-                  let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
-                  //2PI*unit radius = 360, PI*unit = 180
-                  transform = transform + ` rotate(${rotation})`;
-                  transform = transform + ` translate(${radius+25}, 0)`;
-                  d.anchor = 'middle'
-                  //if (rotation > 90) {
-                      transform = transform + ' rotate(90)';
-                      // Notice text anchor issue that also first
-                      d.anchor = "middle";
-                 // }
-                  d.trans = transform;
-              });
-              
+                // Hovering and Interactivity
+                function restoreHighlights() {
+                    rings.attr("opacity", 1); 
+                    ribbons.attr("opacity", 1);
+                }
+                function lowlightAll() {
+                    rings.attr("opacity", 0.2);
+                    ribbons.attr("opacity", 0.2);
+                }
+                function highlightRings(index) {
+                    console.log(index);
+                    let targetSegments = rings.filter( d => {
+                        return connections[d.index].includes(index);
+                    });
+                    targetSegments.attr("opacity",1);
+                }
 
-              rings.append('text')
+                function highlightRibbons(index) {
+                    let targetRibbons = ribbons.filter( d => {
+                        return d.source.index === index || d.target.index === index;
+                    });
+                    targetRibbons.attr("opacity",1);
+                }
+                
+                // Ring Hovering feature add
+                rings.on("mouseout", restoreHighlights)
+                     .on("mouseover", function(event, d) {
+                        if (nodes[d.index].SubContinent == "North America"){
+                            lowlightAll();
+                            highlightRings(d.index);
+                            highlightRibbons(d.index);
+                        }
+                        if (nodes[d.index].SubContinent == "East Asia"){
+                            lowlightAll();
+                            highlightRings(d.index);
+                            highlightRibbons(d.index);
+                        }
+                    });
+                
+                chords.groups.forEach( d => {
+                    let transform = '';
+                    let midpoint = (d.startAngle + d.endAngle) / 2;
+                    let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+                    transform = transform + ` rotate(${rotation})`;
+                    transform = transform + ` translate(${radius+25}, 0)`;
+                    if (rotation > 90) {
+                        transform = transform + ' rotate(180)';
+                        d.anchor = "end";
+                    }
+                    d.trans = transform;
+                });
+                
+                // Text Labels
+                rings.append('text')
                    .attr('transform', d=> d.trans)
-                   .text(d => nodes[d.index].SubContinent)
+                   .text(d => nodes[d.index].Country)
                    .attr('text-anchor', d => d.anchor)
                    .attr('class','chord-label');
-                //    .attr('fill', d => colorScale( nodes[ d.index ].Continent ));
             }
             drawChord();
         </script>
