@@ -108,10 +108,14 @@
 
               Object.values(links).forEach( d => {
                 if (d.Weight > 0) {
-                    matrix[d.Source][d.Target] = d.Weight;
+                    // matrix[d.Source][d.Target] = d.Weight;
+                    // matrix[d.Target][d.Source] = d.Weight;
                     matrix[d.Target][d.Source] = d.Weight;
+                    matrix[d.Source][d.Target] = d.Weight;
                     connections[d.Source].push(d.Target);
                     connections[d.Target].push(d.Source);
+                    // connections[d.Source].push(d.Target);
+                    // connections[d.Target].push(d.Source);
                 }
               });
               console.log("connections", connections);
@@ -133,6 +137,7 @@
 
 
               console.log("chords", chords);
+              console.log("chords groups", chords.groups);
 
 
               chordChart.attr("transform",`translate(${width/2.0},${height/2.0})`);
@@ -151,12 +156,34 @@
               rings.append("path")
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("fill", function (d) {
-                    if (nodes[d.index].SubContinent == 'North America'){
-                       return ('orange');
+                    if (nodes[d.index].Country == 'United States'){
+                       return ('#9292C2');
                     }
-                    if (nodes[d.index].SubContinent == 'East Asia'){
-                       return ("purple");
+                    if (nodes[d.index].Country == 'North Korea'){
+                       return (" #0D6D76");
                     }
+                    if (nodes[d.index].Country == 'Canada'){
+                                return "#EE1460"
+                    }
+                    if (nodes[d.index].Country == 'China'){
+                                return "orange"
+                    }
+
+                    if (nodes[d.index].Country == 'Japan'){
+                                return "purple"
+                    }
+
+                    if (nodes[d.index].Country == 'Mongolia'){
+                                return "#E6484B"
+                    }
+
+                    if (nodes[d.index].Country == 'South Korea'){
+                                return " #033148"
+                            }
+                    
+
+
+
                      else {return 'gray'}
                    })
                    .attr("d", arcGen)
@@ -178,12 +205,36 @@
                         .attr("fill-opacity", 0.5)
                         .style("stroke", 'none')
                         .attr("fill", function (d) {
-                            if (nodes[d.source.index].SubContinent == 'North America'){
-                                return "orange"
+                            if (nodes[d.source.index].Country == 'United States'){
+                                return "#9292C2"
                             }
-                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                            if (nodes[d.source.index].Country == 'Canada'){
+                                return "#EE1460"
+                            }
+                            if (nodes[d.source.index].Country == 'North Korea'   ){
+                                return "#0D6D76";
+                            }
+
+                            if (nodes[d.source.index].Country == 'China'   ){
+                                return "orange";
+                            }
+
+                            if (nodes[d.source.index].Country == 'Japan'   ){
                                 return "purple";
                             }
+
+
+                            if (nodes[d.source.index].Country == 'Mongolia'){
+                                return "#E6484B"
+                            }
+
+                            if (nodes[d.source.index].Country == 'South Korea'){
+                                return " #033148"
+                            }
+
+                           
+
+                           
                             else {return 'gray'}
                             })
                       .attr("d", ribbonGen)
@@ -222,18 +273,18 @@
                 // Hovering and Interactivity
                 function restoreHighlights() {
                     rings.attr("opacity", 1)
-                    ribbons.attr("opacity", 1).style("stroke","none")
+                    ribbons.attr("opacity", 1).style("stroke","none");
 
-                    ribbons.attr("fill", function (d){
-                    if (nodes[d.source.index].SubContinent == 'North America'){
-                                return "orange"
-                            }
-                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
-                                return "purple";
-                            }
-                            else {return 'gray'}
+                    // ribbons.attr("fill", function (d){
+                    // if (nodes[d.source.index].SubContinent == 'North America'){
+                    //             return "orange"
+                    //         }
+                    //         if (nodes[d.source.index].SubContinent == 'East Asia'   ){
+                    //             return "purple";
+                    //         }
+                    //         else {return 'gray'}
 
-                })
+               // })
             }
 
                 function lowlightAll() {
@@ -368,7 +419,7 @@
             const features = ["Healthcare Access and Quality Index","Annual CO2 Emission","Civil Liberty"];
             const units = [' ','Tonnes Per Capita',' ']
             const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
-            const country_colors = ['#5E1240','#3A394E','#E16425','#033148','#0D6D76','#C88477','#E6484B','#9292C2']
+            const country_colors = ['#EE1460','orange','purple','#033148','#0D6D76','#C88477','#E6484B','#9292C2']
 
 
             let spider_colorScale = d3.scaleOrdinal()
