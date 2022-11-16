@@ -39,11 +39,23 @@
 
     </div>
 
-<!-- 
-    <div id = 'bar-container'>
-        <svg id='bar' height = "300" width = '650'></svg>
-        <svg id='bar2' height = "300" width = '650'></svg>
+    <!-- <div class = "column">
+        <div id="send-bar">
+            <h3 class = 'sub-title'>Sending Country:</h3>
+        </div>
+        <div id="receive-bar">
+            <h3 class = 'sub-title'>Receiving Country:</h3>
+        </div>
+    
     </div> -->
+        
+
+
+    <div id = 'bar-container'>
+        <svg id='bar' height = "700" width = '650' overflow = "visible"></svg>
+        <svg id='bar2' height = "700" width = '650' overflow = "visible"></svg>
+    </div>
+
 
     <style> 
 
@@ -126,7 +138,7 @@
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
               const edges_ds = await d3.json("edges_final.json");
-              const nodes_ds = await d3.json("nodes_vfinal.json");
+              const nodes_ds = await d3.json("nodes_vfinal4.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
@@ -193,7 +205,7 @@
                    .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
                    .attr("fill", function (d) {
                     if (nodes[d.index].Country == 'United States'){
-                       return ('#9292C2');
+                       return ('purple');
                     }
                     if (nodes[d.index].Country == 'North Korea'){
                        return (" #0D6D76");
@@ -206,7 +218,7 @@
                     }
 
                     if (nodes[d.index].Country == 'Japan'){
-                                return "purple"
+                                return "#9292C2"
                     }
 
                     if (nodes[d.index].Country == 'Mongolia'){
@@ -242,7 +254,10 @@
                         .style("stroke", 'none')
                         .attr("fill", function (d) {
                             if (nodes[d.target.index].Country == 'United States'){
-                                return "#9292C2"
+                                return "purple"
+                            }
+                            if (nodes[d.source.index].Country == 'United States'){
+                                return "#AC72DA"
                             }
                             if (nodes[d.source.index].Country == 'Canada'){
                                 return "#EE1460"
@@ -255,8 +270,12 @@
                                 return "orange";
                             }
 
+                            if (nodes[d.target.index].Country == 'China'   ){
+                                return "#FC7201";
+                            }
+
                             if (nodes[d.source.index].Country == 'Japan'   ){
-                                return "purple";
+                                return "#9292C2";
                             }
 
                             if (nodes[d.source.index].Country == 'Mongolia'){
@@ -368,18 +387,6 @@
                     });
 
 
-        // const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
-
-// ribbons.on("mouseout", restoreHighlights).on("mouseover", function (event,d){       
-//         for (i in country_names) {
-//              //for (j in country_names) {
-//                            if (nodes[d.source.index].Country == "China"){
-//                             //addcolor(d.source.index,d.target.index)
-//                             console.log(d.source.index,d.target.index);
-                        
-//                     }}});
-        
-
 
 
             //Ribbons mouseover add floating label interaction
@@ -470,261 +477,324 @@
                    .text(d => nodes[d.index].Country)
                    .attr('text-anchor', d => d.anchor)
                    .attr('class','chord-label');
-            }
-            drawChord();
-        </script>
 
-        <!-- Second Visualization: Spider Diagram -->
-       <!---<h1>Spider Diagram</h1> -->
-        <p id = 'spider-chart'>
-        <div class = "column">
-            <div id="send-bar">
-                <h3 class = 'sub-title'>Sending Country:</h3>
-            </div>
-            <div id="receive-bar">
-                <h3 class = 'sub-title'>Receiving Country:</h3>
-            </div>
-        
-        </div>
-            
+                   allKeys2 = Object.values(nodes);
+            country_data2 = {}
+              allKeys2.forEach( (d) =>{
+               console.log('forEach d',d);
+               country_data2[d.Country] = d;
 
-            
-            <script>
-            
-            const features = ["Healthcare Access and Quality Index","Annual CO2 Emission","Civil Liberty"];
-            const units = [' ','Tonnes Per Capita',' ']
-            const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
-            const country_colors = ['#EE1460','orange','purple','#033148','#0D6D76','#C88477','#E6484B','#9292C2']
-
-
-            let spider_colorScale = d3.scaleOrdinal()
-                                .domain([country_names])
-                                .range(country_colors);
-
-
-            
-            country_data = {
-            'China': {'Healthcare Access and Quality Index': 6.2, 'Annual CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
-            'Japan': {'Healthcare Access and Quality Index': 9.02, 'Annual CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
-            'South Korea': {'Healthcare Access and Quality Index': 8.3, 'Annual CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
-            'North Korea': {'Healthcare Access and Quality Index': 4.78, 'Annual CO2 Emission': 0.0, 'Civil Liberty': 3}, 
-            'Taiwan': {'Healthcare Access and Quality Index': 7.8, 'Annual CO2 Emission': 4.87011075125133, 'Civil Liberty': 9}, 
-            'Mongolia': {'Healthcare Access and Quality Index': 4.72, 'Annual CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
-            'United States': {'Healthcare Access and Quality Index': 8.73, 'Annual CO2 Emission': 10.0, 'Civil Liberty': 9},
-            'Canada': {'Healthcare Access and Quality Index': 9.12, 'Annual CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
-            console.log("country_data",country_data)
-            
-            allKeys = Object.keys(country_data);
-            console.log("allkeys", allKeys);
-            allValues = Object.values(country_data);
-            console.log("allvalues", allValues);
-                            
-            const svg = d3.select("svg#spider");
-            const spider_width = svg.attr("width");
-            const spider_height = svg.attr("height");
-            
-            let spiderChart = svg.append("g").attr("id","diagrams");
-            let annotations = svg.append("g").attr("id","annotations");
-            
-            let radialScale = d3.scaleLinear()
-                .domain([0,10])
-                .range([0,200]);
-            let ticks = [2,4,6,8,10];
-            
-            ticks.forEach(t =>
-                annotations.append("circle")
-                .attr("cx", 250)
-                .attr("cy", 320)
-                .attr("fill", "none")
-                .attr("stroke", "lightgray")
-                .attr("r", radialScale(t))
-            );
-            
-            function angleToCoordinate(angle, value){
-                let x = Math.cos(angle) * radialScale(value);
-                let y = Math.sin(angle) * radialScale(value);
-                return {"x": 250 + x, "y": 320 - y};
-            }
-            
-            for (var i = 0; i < features.length; i++) {
-                console.log(i);
-                let ft_name = features[i];
-                let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
-                let line_coordinate = angleToCoordinate(angle, 10);
-                let label_coordinate = angleToCoordinate(angle, 11.6);
-                console.log(line_coordinate);
-
-
-                let transform = ''  
-                let midpoint = (angle) / 2;
-                let rotation = ( midpoint ) * ( 180 / Math.PI ) ;
-                transform = transform + ` rotate(${rotation})`;
-                transform = transform + ` translate(${300}, 0)`;
-
-                
-
-
-            //     chords.groups.forEach(d =>{
-            //       let transform = '';
-            //       // find midpoint, convert to degrees
-            //       let midpoint = (d.startAngle + d.endAngle) / 2;
-            //       let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
-            //       //2PI*unit radius = 360, PI*unit = 180
-            //       transform = transform + ` rotate(${rotation})`;
-            //       transform = transform + ` translate(${radius+25}, 0)`;
-            //       d.anchor = 'middle'
-            //       //if (rotation > 90) {
-            //           transform = transform + ' rotate(90)';
-            //           // Notice text anchor issue that also first
-            //           d.anchor = "middle";
-            //      // }
-            //       d.trans = transform;
-            //   });
-            
-                //draw axis line
-                annotations.append("line")
-                .attr("x1", 250)
-                .attr("y1", 320)
-                .attr("x2", line_coordinate.x)
-                .attr("y2", line_coordinate.y)
-                .attr("stroke","lightgray");
-            
-                //draw axis label
-                annotations.append("text")
-                .attr("x", label_coordinate.x)
-                .attr("y", line_coordinate.y)
-                .attr("transform", transform.ft_name)
-                .text(ft_name)
-                
-                .attr("fill","gray");
-
-            }
-
-
-
-            
-            allKeys.forEach( d => {
-            
-            d3.select("div#send-bar")
-              .append("button")
-              .text(d)
-              .style ("display" , "inline-block")
-              .style("margin","4")
-              .style ("background-color",spider_colorScale(d))
-              .attr("class", "button")
-              .on('click', function(){
-                updateSend(d); 
-            
-              }) 
-            
-            
-              d3.select("div#receive-bar")
-              .append("button")
-              .text(d)
-              .style("margin","4")
-              .style ("background-color",spider_colorScale(d))
-              .attr("class", "button")
-              .on('click', function(){
-                updateReceive(d);
-            
-              })
-            
-            
             });
-            
-            tri_send = spiderChart.append("path")
-                             .attr("stroke-width", 3)
-                             .attr("stroke-opacity", 1)
-                             .attr("opacity", 0.7);
-            
-            tri_receive = spiderChart.append("path")
-                             .attr("stroke-width", 3)
-                             .attr("stroke-opacity", 1)
-                             .attr("opacity", 0.7);
-            
-
-            console.log("spider_colorScale", spider_colorScale);   
-            
-
-        //Bar Plot canvas
-        const svgBar = d3.select("svg#bar")
-
-        let diagrams =  svgBar.append('g').attr('id','bar_diagrams');
-
-        const bar_width = 600;
-        const bar_height = 200;
-        console.log(bar_width);
-
-        var x = d3.scaleLinear().domain([0,10]).range([0,bar_width]);
-
-        var y = d3.scaleBand()
-                  .range([ 0, 200 ])
-                  .domain(features)
-                  .padding(.3);
-
-        const svgBar2 = d3.select("svg#bar2")
-        let diagrams2 =  svgBar2.append('g').attr('id','bar_diagrams2');
-
-        const bar2_width = 600;
-        const bar2_height = 200;
-
-            
-            
-        function updateSend (countryKey) {
-        const data = country_data[countryKey];
+            // const features_label = (country_data2['Africa'].slice(4,12);
+            //const features_label = Object.keys(nodes[0]).slice(4,12);
+            const features_label = Object.keys(country_data2['Africa']).slice(4,12);
+            const features_true = Object.keys(country_data2['Africa']).slice(12,20);
+            console.log('feature_true',features_true);
+            console.log('feature_label',features_label);
         
+
+    
+        
+
+    //     <!-- Second Visualization: Spider Diagram -->
+    //    <!---<h1>Spider Diagram</h1> -->
+    
+
+        
+    
+    const features = ["Healthcare Access and Quality Index","Annual CO2 Emission","Civil Liberty"];
+    const units = [' ','Tonnes Per Capita',' ',' ','Years',' ','US Dollar($)',' ']
+    const country_names = ['China','Japan','South Korea','North Korea','Mongolia',"United States",'Canada']
+    const country_colors = ['#EE1460','orange','#9292C2','#033148','#0D6D76','#E6484B','purple']
+
+
+    let spider_colorScale = d3.scaleOrdinal()
+                        .domain([country_names])
+                        .range(country_colors);
+
+
+    
+    country_data = {
+    'China': {'Healthcare Access and Quality Index': 6.2, 'Annual CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
+    'Japan': {'Healthcare Access and Quality Index': 9.02, 'Annual CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
+    'South Korea': {'Healthcare Access and Quality Index': 8.3, 'Annual CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
+    'North Korea': {'Healthcare Access and Quality Index': 4.78, 'Annual CO2 Emission': 0.0, 'Civil Liberty': 3}, 
+
+    'Mongolia': {'Healthcare Access and Quality Index': 4.72, 'Annual CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
+    'United States': {'Healthcare Access and Quality Index': 8.73, 'Annual CO2 Emission': 10.0, 'Civil Liberty': 9},
+    'Canada': {'Healthcare Access and Quality Index': 9.12, 'Annual CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
+    console.log("country_data",country_data)
+    
+    allKeys = Object.keys(country_data);
+    console.log("allkeys", allKeys);
+    allValues = Object.values(country_data);
+    console.log("allvalues", allValues);
+                    
+    const svg = d3.select("svg#spider");
+    const spider_width = svg.attr("width");
+    const spider_height = svg.attr("height");
+    
+    let spiderChart = svg.append("g").attr("id","diagrams");
+    let annotations = svg.append("g").attr("id","annotations");
+    
+    let radialScale = d3.scaleLinear()
+        .domain([0,10])
+        .range([0,200]);
+    let ticks = [2,4,6,8,10];
+    
+    ticks.forEach(t =>
+        annotations.append("circle")
+        .attr("cx", 250)
+        .attr("cy", 450)
+        .attr("fill", "none")
+        .attr("stroke", "lightgray")
+        .attr("r", radialScale(t))
+    );
+    
+    function angleToCoordinate(angle, value){
+        let x = Math.cos(angle) * radialScale(value);
+        let y = Math.sin(angle) * radialScale(value);
+        return {"x": 250 + x, "y": 450 - y};
+    }
+    
+    for (var i = 0; i < features.length; i++) {
+        console.log(i);
+        let ft_name = features[i];
+        let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
+        let line_coordinate = angleToCoordinate(angle, 10);
+        let label_coordinate = angleToCoordinate(angle, 11.6);
+        console.log(line_coordinate);
+
+
+        let transform = ''  
+        let midpoint = (angle) / 2;
+        let rotation = ( midpoint ) * ( 180 / Math.PI ) ;
+        transform = transform + ` rotate(${rotation})`;
+        transform = transform + ` translate(${300}, 0)`;
+
+        
+
+
+    //     chords.groups.forEach(d =>{
+    //       let transform = '';
+    //       // find midpoint, convert to degrees
+    //       let midpoint = (d.startAngle + d.endAngle) / 2;
+    //       let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
+    //       //2PI*unit radius = 360, PI*unit = 180
+    //       transform = transform + ` rotate(${rotation})`;
+    //       transform = transform + ` translate(${radius+25}, 0)`;
+    //       d.anchor = 'middle'
+    //       //if (rotation > 90) {
+    //           transform = transform + ' rotate(90)';
+    //           // Notice text anchor issue that also first
+    //           d.anchor = "middle";
+    //      // }
+    //       d.trans = transform;
+    //   });
+    
+        //draw axis line
+        annotations.append("line")
+        .attr("x1", 250)
+        .attr("y1", 450)
+        .attr("x2", line_coordinate.x)
+        .attr("y2", line_coordinate.y)
+        .attr("stroke","lightgray");
+    
+        //draw axis label
+        annotations.append("text")
+        .attr("x", label_coordinate.x)
+        .attr("y", line_coordinate.y)
+        .attr("transform", transform.ft_name)
+        .text(ft_name)
+        
+        .attr("fill","gray");
+
+    }
+
+    
+
+
+
+    
+    allKeys2.forEach( d => {
+    
+    d3.select("div#send-bar")
+        .append("button")
+        .text(d)
+        .style ("display" , "inline-block")
+        .style("margin","4")
+        .style ("background-color",spider_colorScale(d))
+        .attr("class", "button")
+        .on('click', function(){
+        updateSend(d); 
+    
+        }) 
+    
+    
+        d3.select("div#receive-bar")
+        .append("button")
+        .text(d)
+        .style("margin","4")
+        .style ("background-color",spider_colorScale(d))
+        .attr("class", "button")
+        .on('click', function(){
+        updateReceive(d);
+    
+        })
+    
+    
+    });
+    
+    tri_send = spiderChart.append("path")
+                        .attr("stroke-width", 3)
+                        .attr("stroke-opacity", 1)
+                        .attr("opacity", 0.7);
+    
+    tri_receive = spiderChart.append("path")
+                        .attr("stroke-width", 3)
+                        .attr("stroke-opacity", 1)
+                        .attr("opacity", 0.7);
+    
+
+    console.log("spider_colorScale", spider_colorScale);   
+    
+
+//Bar Plot canvas
+const svgBar = d3.select("svg#bar")
+
+let diagrams =  svgBar.append('g').attr('id','bar_diagrams');
+
+const bar_width = 600;
+const bar_height = 200;
+console.log(bar_width);
+
+var x = d3.scaleLinear().domain([0,10]).range([0,bar_width]);
+
+var y = d3.scaleBand()
+            .range([ 0, 500 ])
+            .domain(features_label)
+            .padding(.5);
+
+const svgBar2 = d3.select("svg#bar2")
+let diagrams2 =  svgBar2.append('g').attr('id','bar_diagrams2');
+
+const bar2_width = 600;
+const bar2_height = 200;
+
+
+        //add here, default bars before clicking
+        for (var i=0; i<features_label.length;i++){
+            let ft_name = features_label[i];
+            let unit = units[i]
+            console.log('text y',ft_name,y(ft_name));
+            diagrams.append('rect')
+                .attr('id','default_bar')
+                .attr('x',50)
+                .attr('y',y(ft_name))
+                .attr('width',600)
+                .attr('height',y.bandwidth())
+                .attr('fill','rgb(187, 187, 187)')
+                .attr('rx','5')
+
+
+            diagrams2.append('rect')
+                  .attr('id','default_bar')
+                  .attr('x',50)
+                  .attr('y',y(ft_name))
+                  .attr('width',600)
+                  .attr('height',y.bandwidth())
+                  .attr('fill','rgb(187, 187, 187)')
+                  .attr('rx','5')
+
+            if (features_label[i] == 'Annaul CO2 Emission' || 'Average Life Expectancy'  || 'GDP per capita') {
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i]+' ( '+unit+' )')
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                     .attr("font-family", "sans-serif")
+                     .attr("font-size", "23px")
+
+            }else{
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i])
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                     .attr("font-family", "sans-serif")
+                     .attr("font-size", "23px")
+            }
+            
+        }
+
+
+
+function updateSend (countryKey) {
+        const data = country_data2[countryKey];
+
+
         console.log("data",data)
-            
-        
+
+
         let line = d3.line()
             .x(d => d.x)
             .y(d => d.y);
-        
-        
+
+
         function getPathCoordinates(data_point){
         let coordinates = [];
             for (var i = 0; i < features.length; i++){
                 let ft_name = features[i];
-            
+
                 let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
                 coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
             }
             return coordinates;
         }
-        
+
             let d = data;
             console.log("d",d);
-            
-            
+
+
             let coordinates = getPathCoordinates(d);
             console.log("coordinates", coordinates);
-            
-            //draw the path element
-            tri_send.datum(coordinates)  
-                .transition()
-                .attr("d", line) 
-                .attr("stroke", spider_colorScale(countryKey))
-                .attr("fill", spider_colorScale(countryKey))  
-                            
-        
 
-        for (var i=0; i<features.length;i++){
-            let ft_name = features[i];
+            //draw the path element
+            tri_send.datum(coordinates)
+                .transition()
+                .attr("d", line)
+                .attr("stroke", spider_colorScale(countryKey))
+                .attr("fill", spider_colorScale(countryKey))
+
+
+
+        for (var i=0; i<features_true.length;i++){
+            let ft_name = features_label[i];
+            let ft_true = features_true[i];
             let unit = units[i]
-            console.log(ft_name)
-            console.log(d[ft_name])
+
+
+            console.log('ft_name',countryKey,ft_name)
+            console.log('ft_true',countryKey,ft_true)
+            console.log('true value',countryKey,d[ft_true])
+            console.log('text y',y)
+            // console.log('ft_true',d[ft_true])
             diagrams.append('rect')
                 .attr('id','default_bar')
-                .attr('x',0)
+                .attr('x',50)
                 .attr('y',y(ft_name))
-                .attr('width',550)
+                .attr('width',600)
                 .attr('height',y.bandwidth())
                 .attr('fill','rgb(187, 187, 187)')
                 .attr('rx','5')
 
 
             diagrams.append('rect')
-                .attr('x',550-x(d[ft_name]))
+                .attr('x',650-x(d[ft_name]))
                 .attr('y',y(ft_name))
                 .attr('width',x(d[ft_name]))
                 .attr('height',y.bandwidth())
@@ -732,22 +802,22 @@
                 .attr('rx','5')
             if ((ft_name) == 'Annual CO2 Emission'){
             diagrams.append('text')
-                    .text(d[ft_name].toFixed(2) + ' ' +unit)
-                    .attr('x',470)
+                    .text(d[features_true[i]].toFixed(2))
+                    .attr('x',630)
                     .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
                     .attr('fill','white')
-                    .attr("text-anchor", "start")
+                    .attr("text-anchor", "end")
                     .attr("font-family", "sans-serif")
-                    .attr("font-size", "25px")
+                    .attr("font-size", "21px")
             }else{
             diagrams.append('text')
-                    .text(d[ft_name].toFixed(2) + ' ' +unit)
-                    .attr('x',680)
+                    .text(d[features_true[i]].toFixed(2))
+                    .attr('x',630)
                     .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
                     .attr('fill','white')
-                    .attr("text-anchor", "start")
+                    .attr("text-anchor", "end")
                     .attr("font-family", "sans-serif")
-                    .attr("font-size", "25px")
+                    .attr("font-size", "21px")
             }
 
 
@@ -757,54 +827,58 @@
     }
 
 
-            
+
             function updateReceive (countryKey) {
-                const data = country_data[countryKey];
-            
+                const data = country_data2[countryKey];
+
                     console.log("data",data)
-        
+
             let line = d3.line()
                 .x(d => d.x)
                 .y(d => d.y);
-            
+
             function getPathCoordinates(data_point){
             let coordinates = [];
                 for (var i = 0; i < features.length; i++){
                     let ft_name = features[i];
-                
+
                     let angle = (Math.PI /2) + (2 * Math.PI * i / features.length);
                     coordinates.push(angleToCoordinate(angle, data_point[ft_name]));
                 }
                 return coordinates;
             }
-            
+
                 let d = data;
                 console.log("d",d);
-                
-                
+
+
                 let coordinates = getPathCoordinates(d);
                 console.log("coordinates", coordinates);
-                
-            
-            
+
+
+
                 //draw the path element
-                tri_receive.datum(coordinates)  
+                tri_receive.datum(coordinates)
                     .transition()
-                    .attr("d", line) 
+                    .attr("d", line)
                     .attr("stroke", spider_colorScale(countryKey))
-                    .attr("fill", spider_colorScale(countryKey))    
-                    
-                              //draw bar Plot
-               for (var i=0; i<features.length;i++){
-                 let ft_name = features[i];
+                    .attr("fill", spider_colorScale(countryKey))
+
+                //draw bar Plot
+               for (var i=0; i<features_label.length;i++){
+                 let ft_name = features_label[i];
+                 let ft_true = features_true[i];
+                 // let ft_value = features_true[i];
                  let unit = units[i]
                  console.log(ft_name)
                  console.log(d[ft_name])
+                 console.log('true values',i,countryKey,ft_true,d[ft_true]);
+
                  diagrams2.append('rect')
                        .attr('id','default_bar')
                        .attr('x',0)
                        .attr('y',y(ft_name))
-                       .attr('width',750)
+                       .attr('width',600)
                        .attr('height',y.bandwidth())
                        .attr('fill','rgb(187, 187, 187)')
                        .attr('rx','5')
@@ -818,18 +892,22 @@
                        .attr('fill',spider_colorScale(countryKey))
                        .attr('rx','5')
                 diagrams2.append('text')
-                       .text(ft_name.toUpperCase()+' : ' + d[ft_name].toFixed(2) + ' ' +unit)
+                       .text(d[features_true[i]].toFixed(1))
                        .attr('x',5)
                        .attr('y',y(ft_name)+y.bandwidth()/2*1.4)
                        .attr('fill','white')
                        .attr("text-anchor", "start")
                        .attr("font-family", "sans-serif")
-                       .attr("font-size", "25px")
+                       .attr("font-size", "21px")
                }
-              
-            
-            }
-            </script>
-        </p>
-    </body>
-</html>]
+
+
+            }    
+    
+
+}
+    drawChord();
+    </script>
+
+</body>
+</html>
