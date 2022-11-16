@@ -32,23 +32,14 @@
         
             <div>
             
-                <svg id="spider"height="900" width="580" ></svg>
+                <svg id="spider"height="900" width="580" overflow ='visible'></svg>
             </div>
 
         </div>
 
     </div>
 
-    <!-- <div class = "column">
-        <div id="send-bar">
-            <h3 class = 'sub-title'>Sending Country:</h3>
-        </div>
-        <div id="receive-bar">
-            <h3 class = 'sub-title'>Receiving Country:</h3>
-        </div>
-    
-    </div> -->
-        
+
 
 
     <div id = 'bar-container'>
@@ -256,9 +247,8 @@
                             if (nodes[d.target.index].Country == 'United States'){
                                 return "purple"
                             }
-                            if (nodes[d.source.index].Country == 'United States'){
-                                return "#AC72DA"
-                            }
+
+                            
                             if (nodes[d.source.index].Country == 'Canada'){
                                 return "#EE1460"
                             }
@@ -514,21 +504,7 @@
 
 
     
-    country_data = {
-    'China': {'Healthcare Access and Quality Index': 6.2, 'Annual CO2 Emission': 0.7257151269449413, 'Civil Liberty': 4},
-    'Japan': {'Healthcare Access and Quality Index': 9.02, 'Annual CO2 Emission': 3.918873009761511, 'Civil Liberty': 8},
-    'South Korea': {'Healthcare Access and Quality Index': 8.3, 'Annual CO2 Emission': 4.033474509093379, 'Civil Liberty': 8},
-    'North Korea': {'Healthcare Access and Quality Index': 4.78, 'Annual CO2 Emission': 0.0, 'Civil Liberty': 3}, 
-
-    'Mongolia': {'Healthcare Access and Quality Index': 4.72, 'Annual CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
-    'United States': {'Healthcare Access and Quality Index': 8.73, 'Annual CO2 Emission': 10.0, 'Civil Liberty': 9},
-    'Canada': {'Healthcare Access and Quality Index': 9.12, 'Annual CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
-    console.log("country_data",country_data)
-    
-    allKeys = Object.keys(country_data);
-    console.log("allkeys", allKeys);
-    allValues = Object.values(country_data);
-    console.log("allvalues", allValues);
+   
                     
     const svg = d3.select("svg#spider");
     const spider_width = svg.attr("width");
@@ -539,7 +515,7 @@
     
     let radialScale = d3.scaleLinear()
         .domain([0,10])
-        .range([0,200]);
+        .range([0,180]);
     let ticks = [2,4,6,8,10];
     
     ticks.forEach(t =>
@@ -547,7 +523,7 @@
         .attr("cx", 250)
         .attr("cy", 450)
         .attr("fill", "none")
-        .attr("stroke", "lightgray")
+        .attr("stroke", "gray")
         .attr("r", radialScale(t))
     );
     
@@ -562,7 +538,7 @@
         let ft_name = features[i];
         let angle = (Math.PI / 2) + (2 * Math.PI * i / features.length);
         let line_coordinate = angleToCoordinate(angle, 10);
-        let label_coordinate = angleToCoordinate(angle, 11.6);
+        let label_coordinate = angleToCoordinate(angle, 12);
         console.log(line_coordinate);
 
 
@@ -574,40 +550,22 @@
 
         
 
-
-    //     chords.groups.forEach(d =>{
-    //       let transform = '';
-    //       // find midpoint, convert to degrees
-    //       let midpoint = (d.startAngle + d.endAngle) / 2;
-    //       let rotation = ( midpoint ) * ( 180 / Math.PI ) - 90;
-    //       //2PI*unit radius = 360, PI*unit = 180
-    //       transform = transform + ` rotate(${rotation})`;
-    //       transform = transform + ` translate(${radius+25}, 0)`;
-    //       d.anchor = 'middle'
-    //       //if (rotation > 90) {
-    //           transform = transform + ' rotate(90)';
-    //           // Notice text anchor issue that also first
-    //           d.anchor = "middle";
-    //      // }
-    //       d.trans = transform;
-    //   });
-    
         //draw axis line
         annotations.append("line")
         .attr("x1", 250)
         .attr("y1", 450)
         .attr("x2", line_coordinate.x)
         .attr("y2", line_coordinate.y)
-        .attr("stroke","lightgray");
+        .attr("stroke","gray");
     
         //draw axis label
         annotations.append("text")
-        .attr("x", label_coordinate.x)
+        .attr("x", (label_coordinate.x)-50)
         .attr("y", line_coordinate.y)
         .attr("transform", transform.ft_name)
         .text(ft_name)
-        
-        .attr("fill","gray");
+        .attr('text_anchor','start')
+        .attr("fill","black");
 
     }
 
@@ -615,35 +573,7 @@
 
 
 
-    
-    allKeys2.forEach( d => {
-    
-    d3.select("div#send-bar")
-        .append("button")
-        .text(d)
-        .style ("display" , "inline-block")
-        .style("margin","4")
-        .style ("background-color",spider_colorScale(d))
-        .attr("class", "button")
-        .on('click', function(){
-        updateSend(d); 
-    
-        }) 
-    
-    
-        d3.select("div#receive-bar")
-        .append("button")
-        .text(d)
-        .style("margin","4")
-        .style ("background-color",spider_colorScale(d))
-        .attr("class", "button")
-        .on('click', function(){
-        updateReceive(d);
-    
-        })
-    
-    
-    });
+
     
     tri_send = spiderChart.append("path")
                         .attr("stroke-width", 3)
@@ -706,18 +636,8 @@ const bar2_height = 200;
                   .attr('fill','rgb(187, 187, 187)')
                   .attr('rx','5')
 
-            if (features_label[i] == 'Annaul CO2 Emission' || 'Average Life Expectancy'  || 'GDP per capita') {
-                diagrams.append('text')
-                     .attr('id','bar_label')
-                     .text(features_label[i]+' ( '+unit+' )')
-                     .attr('x',670)
-                     .attr('y',y(ft_name)-10)
-                     .attr('fill','black')
-                     .attr("text-anchor", "middle")
-                     .attr("font-family", "sans-serif")
-                     .attr("font-size", "23px")
-
-            }else{
+            if (features_label[i] == 'Healthcare Access and Quality Index') {
+                console.log(features_label[i])
                 diagrams.append('text')
                      .attr('id','bar_label')
                      .text(features_label[i])
@@ -725,10 +645,95 @@ const bar2_height = 200;
                      .attr('y',y(ft_name)-10)
                      .attr('fill','black')
                      .attr("text-anchor", "middle")
-                     .attr("font-family", "sans-serif")
-                     .attr("font-size", "23px")
+                     .attr("font-size", "20px")
+
+            }
+            if (features_label[i] == 'Civil Liberty') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i]+' Index')
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                   
+                     .attr("font-size", "20px")
+            }
+            if (features_label[i] == 'Annual CO2 Emission') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i]+' ('+unit+')')
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+             
+                     .attr("font-size", "20px")
+            }
+            if (features_label[i] == 'Human Development Index') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i])
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                     
+                     .attr("font-size", "20px")
+            }
+            if (features_label[i] == 'Average Life Expectancy') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i]+' ('+unit+')')
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                     
+                     .attr("font-size", "20px")
+            }
+            if (features_label[i] == 'Total population (millions)') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i])
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                    
+                     .attr("font-size", "20px")
             }
             
+            if (features_label[i] == 'GDP per capita') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i]+' ('+unit+')')
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                  
+                     .attr("font-size", "20px")
+            }
+            
+            if (features_label[i] == 'Gender Gap Index') {
+                console.log('!')
+                diagrams.append('text')
+                     .attr('id','bar_label')
+                     .text(features_label[i])
+                     .attr('x',670)
+                     .attr('y',y(ft_name)-10)
+                     .attr('fill','black')
+                     .attr("text-anchor", "middle")
+                
+                     .attr("font-size", "20px")
+            }
         }
 
 
