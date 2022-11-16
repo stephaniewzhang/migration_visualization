@@ -149,16 +149,7 @@
                             .attr("class","segment");
 
               rings.append("path")
-                   .attr("fill", d => colorScale( nodes[ d.index ].SubContinent ))
-                   .attr("fill", function (d) {
-                    if (nodes[d.index].SubContinent == 'North America'){
-                       return ('orange');
-                    }
-                    if (nodes[d.index].SubContinent == 'East Asia'){
-                       return ("purple");
-                    }
-                     else {return 'gray'}
-                   })
+                   .attr("fill", d => colorScale( nodes[d.index].SubContinent))
                    .attr("d", arcGen)
                    .attr("cursor", function(d){
                         if (nodes[d.index].SubContinent == 'North America'){
@@ -177,15 +168,7 @@
                       .attr("class","ribbon")
                         .attr("fill-opacity", 0.5)
                         .style("stroke", 'none')
-                        .attr("fill", function (d) {
-                            if (nodes[d.source.index].SubContinent == 'North America'){
-                                return "orange"
-                            }
-                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
-                                return "purple";
-                            }
-                            else {return 'gray'}
-                            })
+                        .attr("fill", d => colorScale(nodes[d.source.index].SubContinent))
                       .attr("d", ribbonGen)
                       .attr("cursor", function(d){
                         if (nodes[d.source.index].SubContinent == 'North America'){
@@ -224,16 +207,7 @@
                     rings.attr("opacity", 1)
                     ribbons.attr("opacity", 1).style("stroke","none")
 
-                    ribbons.attr("fill", function (d){
-                    if (nodes[d.source.index].SubContinent == 'North America'){
-                                return "orange"
-                            }
-                            if (nodes[d.source.index].SubContinent == 'East Asia'   ){
-                                return "purple";
-                            }
-                            else {return 'gray'}
-
-                })
+                    ribbons.attr("fill", d => colorScale(nodes[d.source.index].SubContinent))
             }
 
                 function lowlightAll() {
@@ -270,17 +244,11 @@
                 // Ring Hovering feature add
                 rings.on("mouseout", restoreHighlights)
                      .on("mouseover", function(event, d) {
-                        if (nodes[d.index].SubContinent == "North America"){
                             lowlightAll();
                             highlightRings(d.index);
                             highlightRibbons(d.index);
                         }
-                        if (nodes[d.index].SubContinent == "East Asia"){
-                            lowlightAll();
-                            highlightRings(d.index);
-                            highlightRibbons(d.index);
-                        }
-                    });
+                        );
 
 
         // const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
