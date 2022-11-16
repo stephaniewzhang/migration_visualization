@@ -8,19 +8,42 @@
     <body>
         <!-- First Visualization: Chord Diagram -->
         <!--<h1>Chord Graph Example</h1> -->
-    <div class = "banner" height = "100%"  width ="100%">
-        <h1 class = "title "> Visualize Global Migration in 2005</h1>
-        <h1 class = "title "></h1>
-    </div>
-    <div class = "main"  width ="100%">
-        <svg id="chord" height="800" width="800" ></svg>
-        <svg id="spider" height="700" width="600"></svg>
+    <div class = "banner" height = "100%"  width ="80%">
+        <h1 class = "title "> Visualisation of Global Migration in 2005</h1>
+        <h2 class = "sub-title">Migration Corridors between East Asia and North America Countries</h2>
+        <h3 class = "sub-title"> By Stephanie Zhang, Ruby Li, Jane Xie, Aurora Zhang </h3>
     </div>
 
+
+    <div class = "main">
+        <h3 class = "intro">When you hover over the ribbons, you can see that in 2005 there were</h3>
+                <text id ='number'></text>
+                <h3 class = "intro">You can also click the ribbons with white stoke to see more metrics about the sending and receiving countries. </h3>
+        
+
+        <div class = 'row'>
+
+            <div class = "chord-area">
+                <svg id="chord" height="900" width="800" ></svg>
+            </div>
+
+        
+        
+        
+            <div>
+            
+                <svg id="spider"height="900" width="580" ></svg>
+            </div>
+
+        </div>
+
+    </div>
+
+<!-- 
     <div id = 'bar-container'>
         <svg id='bar' height = "300" width = '650'></svg>
         <svg id='bar2' height = "300" width = '650'></svg>
-    </div>
+    </div> -->
 
     <style> 
 
@@ -31,6 +54,8 @@
    
     }
 
+
+
     .title {
         color: rgb(44, 69, 97);
         stroke-width: 3;
@@ -38,8 +63,9 @@
     }
 
     .banner {
-        margin-top: 15%;
+        margin-top: 10%;
         margin-bottom: 10%;
+        height: 250px;
     }
 
     .sub-title {
@@ -66,9 +92,23 @@
     }
 
    
- 
-        
+    #number {
+        color: rgb(126, 24, 24);
+        font-size:20;
     
+    }
+
+    .row {
+        display: flex;
+        flex-direction: row;
+
+    }
+
+    
+    .main {
+        margin-left: 80px;
+        margin-right:80px;
+    }
 
 
     </style>
@@ -86,7 +126,7 @@
                                     "#8c956d", "#2cf52b", "#ff0087", "#e9d737"]
           
               const edges_ds = await d3.json("edges_final.json");
-              const nodes_ds = await d3.json("nodes.json");
+              const nodes_ds = await d3.json("nodes_vfinal.json");
 
               let links = edges_ds;
               let nodes = nodes_ds;
@@ -105,19 +145,18 @@
 
               Object.values(links).forEach( d => {
                 if (d.Weight > 0) {
-                    // matrix[d.Source][d.Target] = d.Weight;
+        
                     // matrix[d.Target][d.Source] = d.Weight;
-                    matrix[d.Target][d.Source] = d.Weight;
                     matrix[d.Source][d.Target] = d.Weight;
                     connections[d.Source].push(d.Target);
-                    connections[d.Target].push(d.Source);
+                   // connections[d.Target].push(d.Source);
                     // connections[d.Source].push(d.Target);
                     // connections[d.Target].push(d.Source);
                 }
               });
               console.log("connections", connections);
 
-              let radius = (width / 2.0) - 125;
+              let radius = (width / 2.0) -152;
               // Draw chord
               let chordGen = d3.chord()
                     .padAngle(.04)
@@ -202,7 +241,7 @@
                         .attr("fill-opacity", 0.5)
                         .style("stroke", 'none')
                         .attr("fill", function (d) {
-                            if (nodes[d.source.index].Country == 'United States'){
+                            if (nodes[d.target.index].Country == 'United States'){
                                 return "#9292C2"
                             }
                             if (nodes[d.source.index].Country == 'Canada'){
@@ -219,7 +258,6 @@
                             if (nodes[d.source.index].Country == 'Japan'   ){
                                 return "purple";
                             }
-
 
                             if (nodes[d.source.index].Country == 'Mongolia'){
                                 return "#E6484B"
@@ -270,19 +308,15 @@
                 // Hovering and Interactivity
                 function restoreHighlights() {
                     rings.attr("opacity", 1)
-                    ribbons.attr("opacity", 1).style("stroke","none");
-
-                    // ribbons.attr("fill", function (d){
-                    // if (nodes[d.source.index].SubContinent == 'North America'){
-                    //             return "orange"
-                    //         }
-                    //         if (nodes[d.source.index].SubContinent == 'East Asia'   ){
-                    //             return "purple";
-                    //         }
-                    //         else {return 'gray'}
-
-               // })
+                    ribbons.attr("opacity", 1).style("stroke","none")
+                    
             }
+
+                function hidenlabel () {
+                    d3.select("#source-country").attr("visibility","hidden")
+
+                }
+
 
                 function lowlightAll() {
                     rings.attr("opacity", 0.2);
@@ -314,6 +348,9 @@
                     strokeRibbons.style('stroke','white').style("stroke-width",3)
                 } 
 
+               
+                
+
                 
                 // Ring Hovering feature add
                 rings.on("mouseout", restoreHighlights)
@@ -333,38 +370,79 @@
 
         // const country_names = ['China','Japan','South Korea','North Korea','Taiwan','Mongolia',"United States",'Canada']
 
-        
-        // for (i in country_names) {
-        //      for (j in country_names) {
-        //         ribbons.on("mouseout", restoreHighlights)
-        //                .on("mouseover", function (event,d){
-        //                    if (nodes[d.source.index].Country == i && nodes[d.target.index].Country == j ){
-        //                     addcolor(d.source.index,d.target.index)
+// ribbons.on("mouseout", restoreHighlights).on("mouseover", function (event,d){       
+//         for (i in country_names) {
+//              //for (j in country_names) {
+//                            if (nodes[d.source.index].Country == "China"){
+//                             //addcolor(d.source.index,d.target.index)
+//                             console.log(d.source.index,d.target.index);
                         
-        //             }})
-        // }}
+//                     }}});
+        
 
-            //Ribbons stroke add
+
+
+            //Ribbons mouseover add floating label interaction
+
             ribbons.on("mouseout", restoreHighlights)
-                       .on("mouseover", function (event,d){
-                           if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "China" ){
+                     .on("mouseover", function (event,d){
+                        console.log(nodes[d.source.index].Country, nodes[d.target.index].Country )
+
+                        // d3.select("#source-country").text("Source: "+nodes[d.source.index].Country)
+                        // d3.select("#target-country").text("Target: "+nodes[d.target.index].Country)
+                        d3.select("#number").text(nodes[d.target.index].Weight + " people migrated from " 
+                        + nodes[d.source.index].Country 
+                        +" to "
+                        +nodes[d.target.index].Country )
+
+                        if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "United States" ){
                             addcolor(d.source.index,d.target.index)}
-                           if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "South Korea" ){
+                        if (nodes[d.source.index].Country == "South Korea" && nodes[d.target.index].Country == "United States" ){
                             addcolor(d.source.index,d.target.index)}
-                           });
+                        if (nodes[d.source.index].Country == "Japan" && nodes[d.target.index].Country == "United States" ){
+                            addcolor(d.source.index,d.target.index)}
+                        if (nodes[d.source.index].Country == "North Korea" && nodes[d.target.index].Country == "United States" ){
+                            addcolor(d.source.index,d.target.index)}
+                        if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "Canada" ){
+                            addcolor(d.source.index,d.target.index)}
+                        if (nodes[d.source.index].Country == "South Korea" && nodes[d.target.index].Country == "Canada" ){
+                            addcolor(d.source.index,d.target.index)}
+                        if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "South Korea" ){
+                            addcolor(d.source.index,d.target.index)}
+            });
+
 
         
 
              ribbons.on("click", function(event,d){
-                if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "China" ){
+                if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "United States" ){
                             console.log(nodes[d.source.index].Country, nodes[d.target.index].Country )
                             updateSend(nodes[d.source.index].Country)
                             updateReceive(nodes[d.target.index].Country)}
 
-                if (nodes[d.source.index].Country == "United States" && nodes[d.target.index].Country == "South Korea" ){
-                console.log(nodes[d.source.index].Country, nodes[d.target.index].Country )
-                updateSend(nodes[d.source.index].Country)
-                updateReceive(nodes[d.target.index].Country)}
+                if (nodes[d.source.index].Country == "South Korea" && nodes[d.target.index].Country == "United States" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "Japan" && nodes[d.target.index].Country == "United States" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "North Korea" && nodes[d.target.index].Country == "United States" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "Canada" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "South Korea" && nodes[d.target.index].Country == "Canada" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
+
+                if (nodes[d.source.index].Country == "China" && nodes[d.target.index].Country == "South Korea" ){
+                            updateSend(nodes[d.source.index].Country)
+                            updateReceive(nodes[d.target.index].Country)}
     
            });
 
@@ -434,7 +512,7 @@
             'Mongolia': {'Healthcare Access and Quality Index': 4.72, 'Annual CO2 Emission': 0.1468756369895592, 'Civil Liberty': 8}, 
             'United States': {'Healthcare Access and Quality Index': 8.73, 'Annual CO2 Emission': 10.0, 'Civil Liberty': 9},
             'Canada': {'Healthcare Access and Quality Index': 9.12, 'Annual CO2 Emission': 8.362568794872375, 'Civil Liberty': 9} }
-            console.log(country_data)
+            console.log("country_data",country_data)
             
             allKeys = Object.keys(country_data);
             console.log("allkeys", allKeys);
@@ -455,8 +533,8 @@
             
             ticks.forEach(t =>
                 annotations.append("circle")
-                .attr("cx", 300)
-                .attr("cy", 350)
+                .attr("cx", 250)
+                .attr("cy", 320)
                 .attr("fill", "none")
                 .attr("stroke", "lightgray")
                 .attr("r", radialScale(t))
@@ -465,7 +543,7 @@
             function angleToCoordinate(angle, value){
                 let x = Math.cos(angle) * radialScale(value);
                 let y = Math.sin(angle) * radialScale(value);
-                return {"x": 300 + x, "y": 350 - y};
+                return {"x": 250 + x, "y": 320 - y};
             }
             
             for (var i = 0; i < features.length; i++) {
@@ -505,8 +583,8 @@
             
                 //draw axis line
                 annotations.append("line")
-                .attr("x1", 300)
-                .attr("y1", 350)
+                .attr("x1", 250)
+                .attr("y1", 320)
                 .attr("x2", line_coordinate.x)
                 .attr("y2", line_coordinate.y)
                 .attr("stroke","lightgray");
@@ -754,4 +832,4 @@
             </script>
         </p>
     </body>
-</html>
+</html>]
